@@ -195,6 +195,92 @@ const avala = new Avala({
   The default timeout is 30 seconds. Increase it if you're working with large exports or complex queries.
 </Tip>
 
+## Creating a new account programmatically
+
+The SDK includes a `signup()` function to create new Avala accounts programmatically. This is useful for automation or integration workflows.
+
+```typescript
+import { signup } from "@avala-ai/sdk";
+
+const result = await signup({
+  email: "user@example.com",
+  password: "secure_password",
+  firstName: "John",
+  lastName: "Doe"
+});
+
+console.log("User created:", result.user.username);
+console.log("API Key:", result.apiKey);
+```
+
+### Parameters
+
+<ParamField path="options" type="SignupOptions" required>
+  Account creation options
+  
+  <ParamField path="email" type="string" required>
+    Email address for the new account
+  </ParamField>
+  
+  <ParamField path="password" type="string" required>
+    Password for the new account
+  </ParamField>
+  
+  <ParamField path="firstName" type="string" optional>
+    User's first name
+  </ParamField>
+  
+  <ParamField path="lastName" type="string" optional>
+    User's last name
+  </ParamField>
+  
+  <ParamField path="baseUrl" type="string" optional>
+    Custom API base URL (defaults to production)
+  </ParamField>
+  
+  <ParamField path="timeout" type="number" optional>
+    Request timeout in milliseconds (default: 30000)
+  </ParamField>
+</ParamField>
+
+### Returns
+
+<ResponseField name="user" type="SignupUser">
+  Information about the created user
+  
+  <ResponseField name="uid" type="string">
+    Unique identifier for the user
+  </ResponseField>
+  
+  <ResponseField name="username" type="string">
+    Username for the account
+  </ResponseField>
+  
+  <ResponseField name="email" type="string | null">
+    User's email address
+  </ResponseField>
+  
+  <ResponseField name="firstName" type="string | null">
+    User's first name
+  </ResponseField>
+  
+  <ResponseField name="lastName" type="string | null">
+    User's last name
+  </ResponseField>
+  
+  <ResponseField name="inWaitlist" type="boolean">
+    Whether the user is in the waitlist
+  </ResponseField>
+</ResponseField>
+
+<ResponseField name="apiKey" type="string">
+  API key for the newly created account. Save this securely - you won't be able to retrieve it again.
+</ResponseField>
+
+<Note>
+  The `signup()` function does not require an existing API key. It returns an API key for the newly created account.
+</Note>
+
 ## Security best practices
 
 <AccordionGroup>
@@ -231,7 +317,7 @@ const avala = new Avala({
   <Card
     title="API reference"
     icon="book"
-    href="/api-reference/overview"
+    href="/api/client"
   >
     Explore all available resources and methods
   </Card>

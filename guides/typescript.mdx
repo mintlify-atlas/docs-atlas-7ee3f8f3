@@ -10,7 +10,7 @@ The Avala SDK is written in TypeScript and provides comprehensive type definitio
 The SDK provides full IntelliSense support and compile-time type checking:
 
 ```typescript
-import { Avala, Dataset } from '@avala/sdk';
+import { Avala, Dataset } from '@avala-ai/sdk';
 
 const avala = new Avala({ apiKey: 'your-api-key' });
 
@@ -29,7 +29,7 @@ All resource types are exported from the SDK:
 
 <CodeGroup>
 ```typescript Datasets
-import type { Dataset } from '@avala/sdk';
+import type { Dataset } from '@avala-ai/sdk';
 
 interface Dataset {
   uid: string;
@@ -45,7 +45,7 @@ const dataset: Dataset = await avala.datasets.get('dataset-uid');
 ```
 
 ```typescript Projects
-import type { Project } from '@avala/sdk';
+import type { Project } from '@avala-ai/sdk';
 
 interface Project {
   uid: string;
@@ -59,7 +59,7 @@ const project: Project = await avala.projects.get('project-uid');
 ```
 
 ```typescript Tasks
-import type { Task } from '@avala/sdk';
+import type { Task } from '@avala-ai/sdk';
 
 interface Task {
   uid: string;
@@ -80,7 +80,7 @@ const tasks: Task[] = await avala.tasks.list();
 The SDK uses a generic `CursorPage<T>` type for paginated responses:
 
 ```typescript
-import type { CursorPage, Dataset } from '@avala/sdk';
+import type { CursorPage, Dataset } from '@avala-ai/sdk';
 
 // Type is automatically inferred
 const page = await avala.datasets.list();
@@ -117,7 +117,7 @@ Use the generic `CursorPage<T>` type when building pagination utilities.
 The client configuration is fully typed:
 
 ```typescript
-import { Avala, type AvalaConfig } from '@avala/sdk';
+import { Avala, type AvalaConfig } from '@avala-ai/sdk';
 
 const config: AvalaConfig = {
   apiKey: 'your-api-key',
@@ -148,7 +148,7 @@ All error classes are fully typed with specific properties:
 
 <CodeGroup>
 ```typescript Base error
-import { AvalaError } from '@avala/sdk';
+import { AvalaError } from '@avala-ai/sdk';
 
 try {
   await avala.datasets.get('dataset-uid');
@@ -163,7 +163,7 @@ try {
 ```
 
 ```typescript Rate limit error
-import { RateLimitError } from '@avala/sdk';
+import { RateLimitError } from '@avala-ai/sdk';
 
 try {
   await avala.datasets.list();
@@ -180,7 +180,7 @@ try {
 ```
 
 ```typescript Validation error
-import { ValidationError } from '@avala/sdk';
+import { ValidationError } from '@avala-ai/sdk';
 
 try {
   await avala.datasets.create({ name: '' });
@@ -201,7 +201,7 @@ try {
 Build type-safe wrappers using TypeScript generics:
 
 ```typescript
-import type { Avala, CursorPage } from '@avala/sdk';
+import type { Avala, CursorPage } from '@avala-ai/sdk';
 
 async function fetchAll<T>(
   fetcher: (cursor: string | null) => Promise<CursorPage<T>>
@@ -233,7 +233,7 @@ The SDK includes types for complex nested structures:
 
 <CodeGroup>
 ```typescript Agent
-import type { Agent } from '@avala/sdk';
+import type { Agent } from '@avala-ai/sdk';
 
 interface Agent {
   uid: string;
@@ -255,7 +255,7 @@ const firstEvent: string = agent.events[0];
 ```
 
 ```typescript Organization
-import type { Organization } from '@avala/sdk';
+import type { Organization } from '@avala-ai/sdk';
 
 interface Organization {
   uid: string;
@@ -288,7 +288,7 @@ const org: Organization = await avala.organizations.get('org-slug');
 ```
 
 ```typescript Webhook
-import type { Webhook, WebhookDelivery } from '@avala/sdk';
+import type { Webhook, WebhookDelivery } from '@avala-ai/sdk';
 
 interface Webhook {
   uid: string;
@@ -324,7 +324,7 @@ const deliveries: CursorPage<WebhookDelivery> =
 Create type-safe guards for runtime checks:
 
 ```typescript
-import type { Dataset, Project } from '@avala/sdk';
+import type { Dataset, Project } from '@avala-ai/sdk';
 
 function isDataset(resource: Dataset | Project): resource is Dataset {
   return 'itemCount' in resource;
@@ -351,7 +351,7 @@ if (isDataset(resource)) {
 Many properties are nullable in the API response:
 
 ```typescript
-import type { Dataset } from '@avala/sdk';
+import type { Dataset } from '@avala-ai/sdk';
 
 const dataset: Dataset = await avala.datasets.get('dataset-uid');
 
@@ -376,7 +376,7 @@ Always check for null values before using properties marked as `string | null` o
 Build composable, type-safe request utilities:
 
 ```typescript
-import type { Avala, Dataset, Project } from '@avala/sdk';
+import type { Avala, Dataset, Project } from '@avala-ai/sdk';
 
 class TypeSafeClient {
   constructor(private avala: Avala) {}
@@ -433,8 +433,8 @@ const datasets = await client.listResources(() =>
   Use the `type` keyword for type-only imports:
 
   ```typescript
-  import { Avala } from '@avala/sdk';
-  import type { Dataset, Project, CursorPage } from '@avala/sdk';
+  import { Avala } from '@avala-ai/sdk';
+  import type { Dataset, Project, CursorPage } from '@avala-ai/sdk';
   ```
 </Step>
 
@@ -476,7 +476,7 @@ Leverage TypeScript's IntelliSense in your IDE to discover available properties 
 Build sophisticated type-safe abstractions:
 
 ```typescript
-import type { Avala, CursorPage } from '@avala/sdk';
+import type { Avala, CursorPage } from '@avala-ai/sdk';
 
 type ResourceList<T> = () => Promise<CursorPage<T>>;
 type ResourceGet<T> = (uid: string) => Promise<T>;

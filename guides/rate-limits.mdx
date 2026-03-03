@@ -106,7 +106,7 @@ const datasets = await client.safeRequest(
 When you exceed the rate limit, the API returns a 429 status code:
 
 ```typescript
-import { RateLimitError } from '@avala/sdk';
+import { RateLimitError } from '@avala-ai/sdk';
 
 try {
   const datasets = await avala.datasets.list();
@@ -145,7 +145,7 @@ The `retryAfter` property may be `null` if the server doesn't provide a `Retry-A
   Check for `RateLimitError` when making requests:
 
   ```typescript
-  import { RateLimitError } from '@avala/sdk';
+  import { RateLimitError } from '@avala-ai/sdk';
 
   try {
     return await avala.datasets.list();

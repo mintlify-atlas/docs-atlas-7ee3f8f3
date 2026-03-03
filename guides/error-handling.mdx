@@ -11,7 +11,7 @@ The SDK throws specific error types based on the response status code:
 
 <CodeGroup>
 ```typescript Base error
-import { AvalaError } from '@avala/sdk';
+import { AvalaError } from '@avala-ai/sdk';
 
 try {
   const dataset = await avala.datasets.get('dataset-uid');
@@ -25,7 +25,7 @@ try {
 ```
 
 ```typescript Authentication error
-import { AuthenticationError } from '@avala/sdk';
+import { AuthenticationError } from '@avala-ai/sdk';
 
 try {
   const datasets = await avala.datasets.list();
@@ -38,7 +38,7 @@ try {
 ```
 
 ```typescript Not found error
-import { NotFoundError } from '@avala/sdk';
+import { NotFoundError } from '@avala-ai/sdk';
 
 try {
   const project = await avala.projects.get('invalid-uid');
@@ -69,7 +69,7 @@ The SDK includes these error types:
 Validation errors include detailed information about what went wrong:
 
 ```typescript
-import { ValidationError } from '@avala/sdk';
+import { ValidationError } from '@avala-ai/sdk';
 
 try {
   const dataset = await avala.datasets.create({
@@ -99,7 +99,7 @@ Rate limit errors include retry timing information:
   Use the `RateLimitError` class to detect when you've exceeded rate limits:
 
   ```typescript
-  import { RateLimitError } from '@avala/sdk';
+  import { RateLimitError } from '@avala-ai/sdk';
 
   try {
     const datasets = await avala.datasets.list();
@@ -252,7 +252,7 @@ Use TypeScript's `instanceof` checks to get full type safety when handling error
 Server errors (5xx status codes) are thrown as `ServerError`:
 
 ```typescript
-import { ServerError } from '@avala/sdk';
+import { ServerError } from '@avala-ai/sdk';
 
 try {
   const datasets = await avala.datasets.list();

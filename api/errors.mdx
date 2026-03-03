@@ -70,7 +70,7 @@ Thrown when authentication fails (HTTP 401).
 ### Example
 
 ```typescript
-import { Avala, AuthenticationError } from "@avala/sdk";
+import { Avala, AuthenticationError } from "@avala-ai/sdk";
 
 const avala = new Avala({ apiKey: "invalid-key" });
 
@@ -108,7 +108,7 @@ Thrown when a requested resource is not found (HTTP 404).
 ### Example
 
 ```typescript
-import { Avala, NotFoundError } from "@avala/sdk";
+import { Avala, NotFoundError } from "@avala-ai/sdk";
 
 const avala = new Avala({ apiKey: process.env.AVALA_API_KEY });
 
@@ -144,7 +144,7 @@ Thrown when the rate limit is exceeded (HTTP 429).
 ### Example
 
 ```typescript
-import { Avala, RateLimitError } from "@avala/sdk";
+import { Avala, RateLimitError } from "@avala-ai/sdk";
 
 const avala = new Avala({ apiKey: process.env.AVALA_API_KEY });
 
@@ -192,7 +192,7 @@ Thrown when request validation fails (HTTP 400 or similar).
 ### Example
 
 ```typescript
-import { Avala, ValidationError } from "@avala/sdk";
+import { Avala, ValidationError } from "@avala-ai/sdk";
 
 const avala = new Avala({ apiKey: process.env.AVALA_API_KEY });
 
@@ -235,7 +235,7 @@ Thrown when a server-side error occurs (HTTP 5xx).
 ### Example
 
 ```typescript
-import { Avala, ServerError } from "@avala/sdk";
+import { Avala, ServerError } from "@avala-ai/sdk";
 
 const avala = new Avala({ apiKey: process.env.AVALA_API_KEY });
 
