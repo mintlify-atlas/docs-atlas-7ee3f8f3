@@ -1,0 +1,150 @@
+{
+  "projectType": "sdk-library",
+  "projectName": "Avala TypeScript SDK",
+  "projectDescription": "Official TypeScript SDK and MCP server for the Avala API - build and manage ML annotation datasets, projects, exports, and tasks programmatically.",
+  "theme": "palm",
+  "primaryColor": "#6366f1",
+  "lightColor": "#818cf8",
+  "darkColor": "#4f46e5",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart",
+              "authentication"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/datasets",
+              "concepts/projects",
+              "concepts/tasks",
+              "concepts/exports"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/error-handling",
+              "guides/pagination",
+              "guides/rate-limits",
+              "guides/typescript"
+            ]
+          },
+          {
+            "group": "MCP Server",
+            "pages": [
+              "mcp/overview",
+              "mcp/installation",
+              "mcp/configuration",
+              "mcp/available-tools"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Client",
+            "pages": [
+              "api/client",
+              "api/configuration"
+            ]
+          },
+          {
+            "group": "Core Resources",
+            "pages": [
+              "api/datasets",
+              "api/projects",
+              "api/tasks",
+              "api/exports",
+              "api/storage-configs"
+            ]
+          },
+          {
+            "group": "Quality & Automation",
+            "pages": [
+              "api/agents",
+              "api/annotation-issues",
+              "api/auto-label-jobs",
+              "api/quality-targets",
+              "api/consensus",
+              "api/inference-providers"
+            ]
+          },
+          {
+            "group": "Organization & Collaboration",
+            "pages": [
+              "api/organizations",
+              "api/slices",
+              "api/webhooks"
+            ]
+          },
+          {
+            "group": "Fleet Management",
+            "pages": [
+              "api/fleet/overview",
+              "api/fleet/devices",
+              "api/fleet/recordings",
+              "api/fleet/events",
+              "api/fleet/rules",
+              "api/fleet/alerts"
+            ]
+          },
+          {
+            "group": "Types & Errors",
+            "pages": [
+              "api/types",
+              "api/errors"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "TypeScript SDK with full type safety",
+    "MCP server for AI assistant integrations",
+    "Cursor-based pagination support",
+    "Comprehensive error handling",
+    "Dataset and project management",
+    "Task tracking and exports",
+    "Fleet management for robotics",
+    "Quality monitoring and consensus scoring",
+    "Webhook and agent integrations",
+    "Storage config management (S3, GCS)"
+  ],
+  "publicApiSurface": [
+    "Avala (main client class)",
+    "avala.datasets.list() / get() / create() / listItems() / getItem() / listSequences() / getSequence()",
+    "avala.projects.list() / get()",
+    "avala.tasks.list() / get()",
+    "avala.exports.list() / get() / create()",
+    "avala.storageConfigs.list() / create() / test() / delete()",
+    "avala.agents.list() / get() / listExecutions()",
+    "avala.annotationIssues.list() / get() / getMetrics() / getTools()",
+    "avala.autoLabelJobs.list() / get()",
+    "avala.qualityTargets.list() / get() / evaluate()",
+    "avala.consensus.getConfig() / updateConfig() / listScores() / getSummary() / compute()",
+    "avala.webhooks.list() / get()",
+    "avala.webhookDeliveries.list() / get()",
+    "avala.organizations.list() / get() / listMembers() / listInvitations() / listTeams() / getTeam() / listTeamMembers()",
+    "avala.slices.list() / get() / listItems()",
+    "avala.fleet.devices.list() / get()",
+    "avala.fleet.recordings.list() / get()",
+    "avala.fleet.events.list() / get()",
+    "avala.fleet.rules.list() / get()",
+    "avala.fleet.alerts.list() / get()",
+    "avala.inferenceProviders.list() / get()",
+    "signup()",
+    "AvalaError, AuthenticationError, NotFoundError, RateLimitError, ValidationError, ServerError"
+  ]
+}
