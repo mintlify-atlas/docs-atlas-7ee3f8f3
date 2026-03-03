@@ -1,0 +1,696 @@
+---
+title: Organizations
+description: Manage organizations, members, teams, and invitations
+---
+
+## Organizations
+
+### List organizations
+
+Retrieve a paginated list of organizations.
+
+```typescript
+await avala.organizations.list(options?)
+```
+
+<ParamField path="options" type="object">
+  Optional parameters for pagination.
+  
+  <ParamField path="limit" type="number">
+    Maximum number of organizations to return per page.
+  </ParamField>
+  
+  <ParamField path="cursor" type="string">
+    Cursor for pagination to fetch the next page of results.
+  </ParamField>
+</ParamField>
+
+<ResponseField name="items" type="Organization[]">
+  Array of organization objects.
+  
+  <ResponseField name="uid" type="string">
+    Unique identifier for the organization.
+  </ResponseField>
+  
+  <ResponseField name="name" type="string">
+    Name of the organization.
+  </ResponseField>
+  
+  <ResponseField name="slug" type="string">
+    URL-friendly slug for the organization.
+  </ResponseField>
+  
+  <ResponseField name="handle" type="string | null">
+    Public handle for the organization.
+  </ResponseField>
+  
+  <ResponseField name="description" type="string | null">
+    Description of the organization.
+  </ResponseField>
+  
+  <ResponseField name="logo" type="string | null">
+    URL to the organization's logo.
+  </ResponseField>
+  
+  <ResponseField name="website" type="string | null">
+    Organization's website URL.
+  </ResponseField>
+  
+  <ResponseField name="industry" type="string | null">
+    Industry the organization operates in.
+  </ResponseField>
+  
+  <ResponseField name="visibility" type="string | null">
+    Visibility setting for the organization.
+  </ResponseField>
+  
+  <ResponseField name="memberCount" type="number | null">
+    Number of members in the organization.
+  </ResponseField>
+  
+  <ResponseField name="teamCount" type="number | null">
+    Number of teams in the organization.
+  </ResponseField>
+  
+  <ResponseField name="role" type="string | null">
+    Current user's role in the organization.
+  </ResponseField>
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results.
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results.
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether there are more results available.
+</ResponseField>
+
+### Get organization
+
+Retrieve a specific organization by its slug.
+
+```typescript
+await avala.organizations.get(slug)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization to retrieve.
+</ParamField>
+
+### Create organization
+
+Create a new organization.
+
+```typescript
+await avala.organizations.create(options)
+```
+
+<ParamField path="options" type="object" required>
+  <ParamField path="name" type="string" required>
+    Name of the organization.
+  </ParamField>
+  
+  <ParamField path="description" type="string">
+    Description of the organization.
+  </ParamField>
+  
+  <ParamField path="logo" type="string">
+    URL to the organization's logo.
+  </ParamField>
+  
+  <ParamField path="website" type="string">
+    Organization's website URL.
+  </ParamField>
+  
+  <ParamField path="industry" type="string">
+    Industry the organization operates in.
+  </ParamField>
+  
+  <ParamField path="email" type="string">
+    Contact email for the organization.
+  </ParamField>
+  
+  <ParamField path="phone" type="string">
+    Contact phone number for the organization.
+  </ParamField>
+  
+  <ParamField path="visibility" type="string">
+    Visibility setting for the organization.
+  </ParamField>
+</ParamField>
+
+### Update organization
+
+Update an existing organization.
+
+```typescript
+await avala.organizations.update(slug, options)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization to update.
+</ParamField>
+
+<ParamField path="options" type="object" required>
+  <ParamField path="name" type="string">
+    Name of the organization.
+  </ParamField>
+  
+  <ParamField path="description" type="string">
+    Description of the organization.
+  </ParamField>
+  
+  <ParamField path="logo" type="string">
+    URL to the organization's logo.
+  </ParamField>
+  
+  <ParamField path="website" type="string">
+    Organization's website URL.
+  </ParamField>
+  
+  <ParamField path="handle" type="string">
+    Public handle for the organization.
+  </ParamField>
+  
+  <ParamField path="industry" type="string">
+    Industry the organization operates in.
+  </ParamField>
+  
+  <ParamField path="email" type="string">
+    Contact email for the organization.
+  </ParamField>
+  
+  <ParamField path="phone" type="string">
+    Contact phone number for the organization.
+  </ParamField>
+  
+  <ParamField path="visibility" type="string">
+    Visibility setting for the organization.
+  </ParamField>
+</ParamField>
+
+### Delete organization
+
+Delete an organization.
+
+```typescript
+await avala.organizations.delete(slug)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization to delete.
+</ParamField>
+
+### Get industry choices
+
+Retrieve available industry choices for organizations.
+
+```typescript
+await avala.organizations.industryChoices()
+```
+
+Returns a record of available industry options.
+
+## Members
+
+### List members
+
+Retrieve a paginated list of organization members.
+
+```typescript
+await avala.organizations.listMembers(slug, options?)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="options" type="object">
+  <ParamField path="search" type="string">
+    Search query to filter members.
+  </ParamField>
+  
+  <ParamField path="role" type="string">
+    Filter members by role.
+  </ParamField>
+  
+  <ParamField path="limit" type="number">
+    Maximum number of members to return per page.
+  </ParamField>
+  
+  <ParamField path="cursor" type="string">
+    Cursor for pagination.
+  </ParamField>
+</ParamField>
+
+<ResponseField name="items" type="OrganizationMember[]">
+  Array of organization member objects.
+  
+  <ResponseField name="userUid" type="string">
+    Unique identifier for the user.
+  </ResponseField>
+  
+  <ResponseField name="username" type="string | null">
+    Username of the member.
+  </ResponseField>
+  
+  <ResponseField name="email" type="string | null">
+    Email address of the member.
+  </ResponseField>
+  
+  <ResponseField name="fullName" type="string | null">
+    Full name of the member.
+  </ResponseField>
+  
+  <ResponseField name="picture" type="string | null">
+    URL to the member's profile picture.
+  </ResponseField>
+  
+  <ResponseField name="role" type="string | null">
+    Member's role in the organization.
+  </ResponseField>
+  
+  <ResponseField name="createdAt" type="string | null">
+    Timestamp when the member joined.
+  </ResponseField>
+</ResponseField>
+
+### Remove member
+
+Remove a member from an organization.
+
+```typescript
+await avala.organizations.removeMember(slug, userUid)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="userUid" type="string" required>
+  The unique identifier of the user to remove.
+</ParamField>
+
+### Update member role
+
+Update a member's role in an organization.
+
+```typescript
+await avala.organizations.updateMemberRole(slug, userUid, options)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="userUid" type="string" required>
+  The unique identifier of the user.
+</ParamField>
+
+<ParamField path="options" type="object" required>
+  <ParamField path="role" type="string" required>
+    New role for the member.
+  </ParamField>
+</ParamField>
+
+### Leave organization
+
+Leave an organization as the current user.
+
+```typescript
+await avala.organizations.leave(slug)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization to leave.
+</ParamField>
+
+### Transfer ownership
+
+Transfer ownership of an organization to another member.
+
+```typescript
+await avala.organizations.transferOwnership(slug, options)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="options" type="object" required>
+  <ParamField path="newOwnerUid" type="string" required>
+    The unique identifier of the new owner.
+  </ParamField>
+</ParamField>
+
+## Invitations
+
+### List invitations
+
+Retrieve all invitations for an organization.
+
+```typescript
+await avala.organizations.listInvitations(slug)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ResponseField name="invitations" type="Invitation[]">
+  Array of invitation objects.
+  
+  <ResponseField name="uid" type="string">
+    Unique identifier for the invitation.
+  </ResponseField>
+  
+  <ResponseField name="invitedEmail" type="string">
+    Email address of the invited user.
+  </ResponseField>
+  
+  <ResponseField name="invitedByUsername" type="string | null">
+    Username of the user who sent the invitation.
+  </ResponseField>
+  
+  <ResponseField name="role" type="string | null">
+    Role assigned to the invitation.
+  </ResponseField>
+  
+  <ResponseField name="status" type="string | null">
+    Current status of the invitation.
+  </ResponseField>
+  
+  <ResponseField name="expiresAt" type="string | null">
+    Expiration timestamp for the invitation.
+  </ResponseField>
+  
+  <ResponseField name="isExpired" type="boolean | null">
+    Whether the invitation has expired.
+  </ResponseField>
+  
+  <ResponseField name="acceptUrl" type="string | null">
+    URL to accept the invitation.
+  </ResponseField>
+</ResponseField>
+
+### Create invitation
+
+Create a new invitation to join an organization.
+
+```typescript
+await avala.organizations.createInvitation(slug, options)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="options" type="object" required>
+  <ParamField path="email" type="string" required>
+    Email address of the user to invite.
+  </ParamField>
+  
+  <ParamField path="role" type="string">
+    Role to assign to the invited user.
+  </ParamField>
+</ParamField>
+
+### Resend invitation
+
+Resend an existing invitation.
+
+```typescript
+await avala.organizations.resendInvitation(slug, invitationUid)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="invitationUid" type="string" required>
+  The unique identifier of the invitation to resend.
+</ParamField>
+
+### Cancel invitation
+
+Cancel a pending invitation.
+
+```typescript
+await avala.organizations.cancelInvitation(slug, invitationUid)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="invitationUid" type="string" required>
+  The unique identifier of the invitation to cancel.
+</ParamField>
+
+## Teams
+
+### List teams
+
+Retrieve all teams in an organization.
+
+```typescript
+await avala.organizations.listTeams(slug)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ResponseField name="teams" type="Team[]">
+  Array of team objects.
+  
+  <ResponseField name="uid" type="string">
+    Unique identifier for the team.
+  </ResponseField>
+  
+  <ResponseField name="name" type="string">
+    Name of the team.
+  </ResponseField>
+  
+  <ResponseField name="slug" type="string | null">
+    URL-friendly slug for the team.
+  </ResponseField>
+  
+  <ResponseField name="description" type="string | null">
+    Description of the team.
+  </ResponseField>
+  
+  <ResponseField name="color" type="string | null">
+    Color associated with the team.
+  </ResponseField>
+  
+  <ResponseField name="memberCount" type="number | null">
+    Number of members in the team.
+  </ResponseField>
+</ResponseField>
+
+### Create team
+
+Create a new team in an organization.
+
+```typescript
+await avala.organizations.createTeam(slug, options)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="options" type="object" required>
+  <ParamField path="name" type="string" required>
+    Name of the team.
+  </ParamField>
+  
+  <ParamField path="description" type="string">
+    Description of the team.
+  </ParamField>
+  
+  <ParamField path="color" type="string">
+    Color code for the team.
+  </ParamField>
+</ParamField>
+
+### Get team
+
+Retrieve a specific team by its slug.
+
+```typescript
+await avala.organizations.getTeam(slug, teamSlug)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="teamSlug" type="string" required>
+  The slug of the team to retrieve.
+</ParamField>
+
+### Update team
+
+Update an existing team.
+
+```typescript
+await avala.organizations.updateTeam(slug, teamSlug, options)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="teamSlug" type="string" required>
+  The slug of the team to update.
+</ParamField>
+
+<ParamField path="options" type="object" required>
+  <ParamField path="name" type="string">
+    Name of the team.
+  </ParamField>
+  
+  <ParamField path="description" type="string">
+    Description of the team.
+  </ParamField>
+  
+  <ParamField path="color" type="string">
+    Color code for the team.
+  </ParamField>
+</ParamField>
+
+### Delete team
+
+Delete a team from an organization.
+
+```typescript
+await avala.organizations.deleteTeam(slug, teamSlug)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="teamSlug" type="string" required>
+  The slug of the team to delete.
+</ParamField>
+
+## Team members
+
+### List team members
+
+Retrieve all members of a team.
+
+```typescript
+await avala.organizations.listTeamMembers(slug, teamSlug)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="teamSlug" type="string" required>
+  The slug of the team.
+</ParamField>
+
+<ResponseField name="members" type="TeamMember[]">
+  Array of team member objects.
+  
+  <ResponseField name="userUid" type="string">
+    Unique identifier for the user.
+  </ResponseField>
+  
+  <ResponseField name="username" type="string | null">
+    Username of the member.
+  </ResponseField>
+  
+  <ResponseField name="email" type="string | null">
+    Email address of the member.
+  </ResponseField>
+  
+  <ResponseField name="fullName" type="string | null">
+    Full name of the member.
+  </ResponseField>
+  
+  <ResponseField name="role" type="string | null">
+    Member's role in the team.
+  </ResponseField>
+</ResponseField>
+
+### Add team member
+
+Add a member to a team.
+
+```typescript
+await avala.organizations.addTeamMember(slug, teamSlug, options)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="teamSlug" type="string" required>
+  The slug of the team.
+</ParamField>
+
+<ParamField path="options" type="object" required>
+  <ParamField path="userUid" type="string" required>
+    Unique identifier of the user to add.
+  </ParamField>
+  
+  <ParamField path="role" type="string">
+    Role to assign to the team member.
+  </ParamField>
+</ParamField>
+
+### Remove team member
+
+Remove a member from a team.
+
+```typescript
+await avala.organizations.removeTeamMember(slug, teamSlug, userUid)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="teamSlug" type="string" required>
+  The slug of the team.
+</ParamField>
+
+<ParamField path="userUid" type="string" required>
+  The unique identifier of the user to remove.
+</ParamField>
+
+### Update team member role
+
+Update a team member's role.
+
+```typescript
+await avala.organizations.updateTeamMemberRole(slug, teamSlug, userUid, options)
+```
+
+<ParamField path="slug" type="string" required>
+  The slug of the organization.
+</ParamField>
+
+<ParamField path="teamSlug" type="string" required>
+  The slug of the team.
+</ParamField>
+
+<ParamField path="userUid" type="string" required>
+  The unique identifier of the user.
+</ParamField>
+
+<ParamField path="options" type="object" required>
+  <ParamField path="role" type="string" required>
+    New role for the team member.
+  </ParamField>
+</ParamField>

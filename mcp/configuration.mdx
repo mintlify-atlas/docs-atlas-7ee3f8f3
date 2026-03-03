@@ -1,0 +1,194 @@
+---
+title: Configuration
+description: Configure authentication, permissions, and behavior for the Avala MCP server
+---
+
+The Avala MCP server is configured through environment variables. This allows you to control authentication, enable write operations, and customize server behavior.
+
+## Environment variables
+
+### Required configuration
+
+<ParamField path="AVALA_API_KEY" type="string" required>
+  Your Avala API key. Get yours from the [API keys page](https://avala.ai/settings/api-keys).
+
+  **Example**: `sk_live_1234567890abcdef`
+</ParamField>
+
+### Optional configuration
+
+<ParamField path="AVALA_MCP_ENABLE_MUTATIONS" type="boolean" default="false">
+  Enable write operations (create, update, delete). When disabled, the server runs in read-only mode.
+
+  **Accepted values**: `true`, `1`, `yes`, `on` (case-insensitive)
+
+  **Example**: `AVALA_MCP_ENABLE_MUTATIONS=true`
+</ParamField>
+
+## Read-only vs. write mode
+
+By default, the MCP server operates in **read-only mode** for safety. This allows AI assistants to explore and analyze your workspace without making changes.
+
+### Read-only mode (default)
+
+When `AVALA_MCP_ENABLE_MUTATIONS` is not set or is `false`:
+
+```bash
+Avala MCP running in read-only mode. 
+Set AVALA_MCP_ENABLE_MUTATIONS=true to enable write/delete tools.
+```
+
+**Available operations**:
+- List and get operations for all resources
+- Query workspace statistics
+- Test storage configurations
+- View exports, quality metrics, and consensus data
+
+**Unavailable operations**:
+- Creating datasets, agents, or webhooks
+- Updating annotation issues or quality targets
+- Deleting any resources
+- Triggering exports or consensus computation
+
+### Write mode
+
+When `AVALA_MCP_ENABLE_MUTATIONS=true`:
+
+<Warning>
+Write mode allows the AI assistant to modify your workspace. Only enable this when you trust the assistant and understand the implications.
+</Warning>
+
+**Additional capabilities**:
+- Create datasets, agents, webhooks, and storage configurations
+- Update annotation issues and their status
+- Delete agents, webhooks, and storage configurations
+- Trigger data exports and consensus computation
+- Register fleet devices and acknowledge alerts
+
+## Configuration examples
+
+### Claude Desktop (read-only)
+
+Safe exploration without modification:
+
+```json claude_desktop_config.json
+{
+  "mcpServers": {
+    "avala": {
+      "command": "npx",
+      "args": ["-y", "@avala-ai/mcp-server"],
+      "env": {
+        "AVALA_API_KEY": "sk_live_your_key_here"
+      }
+    }
+  }
+}
+```
+
+### Claude Desktop (write enabled)
+
+Full access including create/update/delete:
+
+```json claude_desktop_config.json
+{
+  "mcpServers": {
+    "avala": {
+      "command": "npx",
+      "args": ["-y", "@avala-ai/mcp-server"],
+      "env": {
+        "AVALA_API_KEY": "sk_live_your_key_here",
+        "AVALA_MCP_ENABLE_MUTATIONS": "true"
+      }
+    }
+  }
+}
+```
+
+### Cline (VS Code)
+
+Configuration for the Cline extension:
+
+```json MCP Server Settings
+{
+  "name": "avala",
+  "command": "npx",
+  "args": ["-y", "@avala-ai/mcp-server"],
+  "env": {
+    "AVALA_API_KEY": "sk_live_your_key_here",
+    "AVALA_MCP_ENABLE_MUTATIONS": "true"
+  }
+}
+```
+
+### Manual execution
+
+Run the server from the command line for testing:
+
+<CodeGroup>
+```bash Read-only
+export AVALA_API_KEY="sk_live_your_key_here"
+avala-mcp-server
+```
+
+```bash Write enabled
+export AVALA_API_KEY="sk_live_your_key_here"
+export AVALA_MCP_ENABLE_MUTATIONS="true"
+avala-mcp-server
+```
+</CodeGroup>
+
+## API key management
+
+### Getting your API key
+
+<Steps>
+  <Step title="Navigate to settings">
+    Go to the [Avala API keys page](https://avala.ai/settings/api-keys) in your workspace settings.
+  </Step>
+
+  <Step title="Create a new key">
+    Click "Create API Key" and give it a descriptive name (e.g., "MCP Server - Claude Desktop").
+  </Step>
+
+  <Step title="Copy and store securely">
+    Copy the key immediately after creation. You won't be able to view it again.
+  </Step>
+
+  <Step title="Add to configuration">
+    Add the key to your MCP client configuration as shown in the examples above.
+  </Step>
+</Steps>
+
+### Security best practices
+
+<Warning>
+**Never commit API keys to version control.** Use environment variables, secret managers, or encrypted configuration files.
+</Warning>
+
+- **Use separate keys** for different integrations (development, production, different AI assistants)
+- **Rotate keys regularly** to limit exposure from potential leaks
+- **Revoke compromised keys** immediately from the API keys page
+- **Start with read-only** and only enable mutations when necessary
+- **Monitor usage** through your workspace's API activity logs
+
+## Permission scoping
+
+The MCP server respects your API key's permissions. If your API key has restricted access to certain projects or datasets, the MCP server will inherit those restrictions.
+
+<Note>
+API key scoping is managed in the Avala dashboard. The MCP server cannot bypass these restrictions.
+</Note>
+
+## Server information
+
+The MCP server identifies itself to clients with:
+
+- **Name**: `avala`
+- **Version**: `0.4.0` (updates with package version)
+- **Protocol**: Model Context Protocol (MCP) via stdio transport
+
+## Next steps
+
+<Card title="Available tools" icon="wrench" href="/mcp/available-tools">
+  Explore all available MCP tools and their parameters
+</Card>

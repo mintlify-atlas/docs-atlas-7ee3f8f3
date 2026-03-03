@@ -1,0 +1,124 @@
+---
+title: Installation
+description: Install the Avala TypeScript SDK in your project
+---
+
+## System requirements
+
+Before installing the SDK, ensure your environment meets these requirements:
+
+<CardGroup cols={2}>
+  <Card icon="node">
+    **Node.js**
+    
+    Version 18 or higher
+  </Card>
+  <Card icon="code">
+    **TypeScript**
+    
+    Version 5.0+ recommended (optional)
+  </Card>
+</CardGroup>
+
+<Note>
+  While TypeScript is recommended for the best developer experience, the SDK works perfectly with plain JavaScript.
+</Note>
+
+## Install the SDK
+
+Choose your preferred package manager to install `@avala-ai/sdk`:
+
+<CodeGroup>
+
+```bash npm
+npm install @avala-ai/sdk
+```
+
+```bash yarn
+yarn add @avala-ai/sdk
+```
+
+```bash pnpm
+pnpm add @avala-ai/sdk
+```
+
+</CodeGroup>
+
+## Verify installation
+
+Once installed, verify that the SDK is working by importing it:
+
+<CodeGroup>
+
+```typescript TypeScript
+import Avala from "@avala-ai/sdk";
+
+console.log("Avala SDK imported successfully!");
+```
+
+```javascript JavaScript (ESM)
+import Avala from "@avala-ai/sdk";
+
+console.log("Avala SDK imported successfully!");
+```
+
+```javascript JavaScript (CommonJS)
+const Avala = require("@avala-ai/sdk").default;
+
+console.log("Avala SDK imported successfully!");
+```
+
+</CodeGroup>
+
+<Tip>
+  The SDK supports both ESM (`import`) and CommonJS (`require`) module systems, so you can use whichever your project prefers.
+</Tip>
+
+## Module formats
+
+The SDK ships with multiple build formats to ensure compatibility:
+
+| Format | Entry Point | Use Case |
+|--------|-------------|----------|
+| **ESM** | `dist/index.js` | Modern Node.js projects using `import` |
+| **CommonJS** | `dist/index.cjs` | Legacy Node.js projects using `require` |
+| **TypeScript** | `dist/index.d.ts` | Type definitions for TypeScript projects |
+
+<Note>
+  Your bundler or Node.js runtime will automatically select the correct format based on your project configuration.
+</Note>
+
+## TypeScript configuration
+
+If you're using TypeScript, ensure your `tsconfig.json` includes these recommended settings:
+
+```json tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  }
+}
+```
+
+<Tip>
+  The SDK includes complete TypeScript type definitions, providing full IntelliSense support in VS Code and other editors.
+</Tip>
+
+## Next steps
+
+<Steps>
+  <Step title="Set up authentication">
+    Configure your API key to start making requests. See [Authentication](/authentication).
+  </Step>
+  <Step title="Make your first API call">
+    Follow the [Quick start guide](/quickstart) to list datasets and create exports.
+  </Step>
+  <Step title="Explore the API">
+    Browse the [API Reference](/api/client) to discover all available resources and methods.
+  </Step>
+</Steps>

@@ -1,0 +1,327 @@
+---
+title: Agents
+description: Manage automation agents that respond to events in your workflows
+---
+
+Agents allow you to automate responses to events in your annotation workflows. Configure agents to listen for specific events and trigger callbacks to your external services.
+
+## List agents
+
+Retrieve a paginated list of agents.
+
+```typescript
+const agents = await avala.agents.list({
+  limit: 50,
+  cursor: 'next-cursor'
+});
+```
+
+### Parameters
+
+<ParamField path="options.limit" type="number" optional>
+  Maximum number of agents to return per page
+</ParamField>
+
+<ParamField path="options.cursor" type="string" optional>
+  Cursor for pagination
+</ParamField>
+
+### Returns
+
+Returns a cursor-paginated list of agent objects.
+
+<ResponseField name="items" type="Agent[]">
+  Array of agent objects
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether more results are available
+</ResponseField>
+
+## Create an agent
+
+Create a new automation agent.
+
+```typescript
+const agent = await avala.agents.create({
+  name: 'Quality Control Agent',
+  description: 'Automatically validates annotations',
+  callbackUrl: 'https://api.example.com/webhooks/agent',
+  events: ['task.completed', 'annotation.created'],
+  project: 'project-uid',
+  taskTypes: ['segmentation', 'classification']
+});
+```
+
+### Parameters
+
+<ParamField path="options.name" type="string" required>
+  Name of the agent
+</ParamField>
+
+<ParamField path="options.description" type="string" optional>
+  Description of the agent's purpose
+</ParamField>
+
+<ParamField path="options.callbackUrl" type="string" optional>
+  URL to send event callbacks to
+</ParamField>
+
+<ParamField path="options.events" type="string[]" required>
+  Array of event types the agent should listen for
+</ParamField>
+
+<ParamField path="options.project" type="string" optional>
+  Project UID to scope the agent to
+</ParamField>
+
+<ParamField path="options.taskTypes" type="string[]" optional>
+  Task types the agent should respond to
+</ParamField>
+
+### Returns
+
+Returns the created agent object.
+
+<ResponseField name="uid" type="string">
+  Unique identifier for the agent
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Name of the agent
+</ResponseField>
+
+<ResponseField name="description" type="string | null">
+  Description of the agent
+</ResponseField>
+
+<ResponseField name="events" type="string[]">
+  Events the agent listens for
+</ResponseField>
+
+<ResponseField name="callbackUrl" type="string | null">
+  Callback URL for the agent
+</ResponseField>
+
+<ResponseField name="isActive" type="boolean">
+  Whether the agent is active
+</ResponseField>
+
+<ResponseField name="project" type="string | null">
+  Project UID the agent is scoped to
+</ResponseField>
+
+<ResponseField name="taskTypes" type="string[]">
+  Task types the agent responds to
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null">
+  ISO 8601 timestamp of when the agent was created
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null">
+  ISO 8601 timestamp of when the agent was last updated
+</ResponseField>
+
+## Get an agent
+
+Retrieve a specific agent by UID.
+
+```typescript
+const agent = await avala.agents.get('agent-uid');
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the agent
+</ParamField>
+
+### Returns
+
+Returns the agent object.
+
+## Update an agent
+
+Update an existing agent.
+
+```typescript
+const agent = await avala.agents.update('agent-uid', {
+  name: 'Updated Agent Name',
+  isActive: false,
+  events: ['task.completed']
+});
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the agent to update
+</ParamField>
+
+<ParamField path="options.name" type="string" optional>
+  New name for the agent
+</ParamField>
+
+<ParamField path="options.description" type="string" optional>
+  New description for the agent
+</ParamField>
+
+<ParamField path="options.callbackUrl" type="string" optional>
+  New callback URL
+</ParamField>
+
+<ParamField path="options.events" type="string[]" optional>
+  New array of event types
+</ParamField>
+
+<ParamField path="options.isActive" type="boolean" optional>
+  Whether the agent should be active
+</ParamField>
+
+<ParamField path="options.project" type="string" optional>
+  New project UID to scope the agent to
+</ParamField>
+
+<ParamField path="options.taskTypes" type="string[]" optional>
+  New task types the agent should respond to
+</ParamField>
+
+### Returns
+
+Returns the updated agent object.
+
+## Delete an agent
+
+Delete an agent.
+
+```typescript
+await avala.agents.delete('agent-uid');
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the agent to delete
+</ParamField>
+
+### Returns
+
+Returns void on success.
+
+## List agent executions
+
+Retrieve execution history for a specific agent.
+
+```typescript
+const executions = await avala.agents.listExecutions('agent-uid', {
+  limit: 50,
+  cursor: 'next-cursor'
+});
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the agent
+</ParamField>
+
+<ParamField path="options.limit" type="number" optional>
+  Maximum number of executions to return per page
+</ParamField>
+
+<ParamField path="options.cursor" type="string" optional>
+  Cursor for pagination
+</ParamField>
+
+### Returns
+
+Returns a cursor-paginated list of agent execution objects.
+
+<ResponseField name="items" type="AgentExecution[]">
+  Array of agent execution objects
+</ResponseField>
+
+<ResponseField name="items[].uid" type="string">
+  Unique identifier for the execution
+</ResponseField>
+
+<ResponseField name="items[].registration" type="string">
+  Agent registration UID
+</ResponseField>
+
+<ResponseField name="items[].eventType" type="string">
+  Type of event that triggered the execution
+</ResponseField>
+
+<ResponseField name="items[].task" type="string | null">
+  Task UID associated with the execution
+</ResponseField>
+
+<ResponseField name="items[].result" type="string | null">
+  Result of the execution
+</ResponseField>
+
+<ResponseField name="items[].status" type="string | null">
+  Execution status
+</ResponseField>
+
+<ResponseField name="items[].action" type="string | null">
+  Action taken by the agent
+</ResponseField>
+
+<ResponseField name="items[].eventPayload" type="object | null">
+  Payload of the event that triggered the execution
+</ResponseField>
+
+<ResponseField name="items[].responsePayload" type="object | null">
+  Response payload from the agent
+</ResponseField>
+
+<ResponseField name="items[].errorMessage" type="string | null">
+  Error message if the execution failed
+</ResponseField>
+
+<ResponseField name="items[].startedAt" type="string | null">
+  ISO 8601 timestamp of when the execution started
+</ResponseField>
+
+<ResponseField name="items[].completedAt" type="string | null">
+  ISO 8601 timestamp of when the execution completed
+</ResponseField>
+
+<ResponseField name="items[].createdAt" type="string | null">
+  ISO 8601 timestamp of when the execution was created
+</ResponseField>
+
+<ResponseField name="items[].updatedAt" type="string | null">
+  ISO 8601 timestamp of when the execution was last updated
+</ResponseField>
+
+## Test an agent
+
+Test an agent's callback URL to verify connectivity.
+
+```typescript
+const result = await avala.agents.test('agent-uid');
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the agent to test
+</ParamField>
+
+### Returns
+
+<ResponseField name="success" type="boolean">
+  Whether the test was successful
+</ResponseField>

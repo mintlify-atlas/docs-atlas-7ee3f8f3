@@ -1,0 +1,146 @@
+---
+title: Avala TypeScript SDK
+description: Official TypeScript SDK for building ML annotation workflows programmatically
+---
+
+<img
+  className="block dark:hidden"
+  src="/images/hero-light.svg"
+  alt="Avala SDK Hero Light"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/hero-dark.svg"
+  alt="Avala SDK Hero Dark"
+/>
+
+## Build powerful ML annotation workflows
+
+The Avala TypeScript SDK provides a type-safe, intuitive interface to the Avala API. Manage datasets, projects, exports, tasks, and more with full TypeScript support.
+
+<CardGroup cols={2}>
+  <Card
+    title="Installation"
+    icon="download"
+    href="/installation"
+  >
+    Get started with npm, yarn, or pnpm in seconds
+  </Card>
+  <Card
+    title="Quick start"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Your first API call in under 5 minutes
+  </Card>
+  <Card
+    title="Authentication"
+    icon="key"
+    href="/authentication"
+  >
+    Secure your API requests with API keys
+  </Card>
+  <Card
+    title="API reference"
+    icon="code"
+    href="/api-reference/overview"
+  >
+    Explore all available resources and methods
+  </Card>
+</CardGroup>
+
+## Key features
+
+<CardGroup cols={3}>
+  <Card icon="shield-check">
+    **Type-safe**
+    
+    Full TypeScript support with complete type definitions
+  </Card>
+  <Card icon="layer-group">
+    **Comprehensive**
+    
+    Access datasets, projects, exports, tasks, agents, and more
+  </Card>
+  <Card icon="gauge-high">
+    **High performance**
+    
+    Built for speed with efficient cursor-based pagination
+  </Card>
+  <Card icon="circle-exclamation">
+    **Error handling**
+    
+    Structured error types for robust error management
+  </Card>
+  <Card icon="arrows-rotate">
+    **Auto-retry**
+    
+    Intelligent retry logic for transient failures
+  </Card>
+  <Card icon="code-branch">
+    **Modern**
+    
+    ESM and CJS support, Node.js 18+
+  </Card>
+</CardGroup>
+
+## What you can build
+
+<AccordionGroup>
+  <Accordion title="Dataset management">
+    Browse, inspect, and manage ML annotation datasets programmatically. List datasets with filters, retrieve detailed metadata, and access dataset items.
+  </Accordion>
+  <Accordion title="Project automation">
+    Automate project workflows by creating exports, managing tasks, and orchestrating annotation pipelines at scale.
+  </Accordion>
+  <Accordion title="Quality control">
+    Set up quality targets, compute consensus scores, and track annotation issues to maintain high-quality datasets.
+  </Accordion>
+  <Accordion title="AI agents">
+    Register agents that respond to annotation events, enabling automated validation, data augmentation, and custom workflows.
+  </Accordion>
+  <Accordion title="Fleet management">
+    Monitor devices, track recordings, create rules, and manage alerts for edge AI deployments.
+  </Accordion>
+</AccordionGroup>
+
+## Quick example
+
+Here's a taste of what working with the Avala SDK looks like:
+
+```typescript
+import Avala from "@avala-ai/sdk";
+
+const avala = new Avala(); // reads AVALA_API_KEY from env
+
+// List datasets
+const datasets = await avala.datasets.list({ limit: 10 });
+datasets.items.forEach(d => console.log(d.uid, d.name));
+
+// Create an export
+const exp = await avala.exports.create({ project: "project-uid" });
+console.log(`Export ${exp.uid} status: ${exp.status}`);
+```
+
+<Note>
+  The SDK automatically reads your API key from the `AVALA_API_KEY` environment variable. See [Authentication](/authentication) for more options.
+</Note>
+
+## Ready to get started?
+
+<CardGroup cols={2}>
+  <Card
+    title="Install the SDK"
+    icon="download"
+    href="/installation"
+  >
+    Add @avala-ai/sdk to your project
+  </Card>
+  <Card
+    title="Follow the quick start"
+    icon="play"
+    href="/quickstart"
+  >
+    Make your first API call
+  </Card>
+</CardGroup>

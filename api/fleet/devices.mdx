@@ -1,0 +1,220 @@
+---
+title: Fleet devices
+description: Register and manage devices in your fleet
+---
+
+The Fleet Devices resource allows you to register, update, and manage devices in your fleet.
+
+## List devices
+
+Retrieve a paginated list of fleet devices.
+
+```typescript
+const devices = await client.fleet.devices.list(options?);
+```
+
+### Parameters
+
+<ParamField path="options" type="ListDevicesOptions" optional>
+  Optional filtering and pagination parameters
+
+  <ParamField path="status" type="string" optional>
+    Filter devices by status (e.g., 'online', 'offline', 'maintenance')
+  </ParamField>
+
+  <ParamField path="type" type="string" optional>
+    Filter devices by type
+  </ParamField>
+
+  <ParamField path="limit" type="number" optional>
+    Maximum number of devices to return per page
+  </ParamField>
+
+  <ParamField path="cursor" type="string" optional>
+    Cursor for pagination
+  </ParamField>
+</ParamField>
+
+### Returns
+
+<ResponseField name="items" type="FleetDevice[]">
+  Array of fleet devices
+
+  <ResponseField name="uid" type="string">
+    Unique identifier for the device
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Device name
+  </ResponseField>
+
+  <ResponseField name="type" type="string | null">
+    Device type
+  </ResponseField>
+
+  <ResponseField name="status" type="string | null">
+    Current device status
+  </ResponseField>
+
+  <ResponseField name="tags" type="string[]">
+    Device tags
+  </ResponseField>
+
+  <ResponseField name="firmwareVersion" type="string | null">
+    Current firmware version
+  </ResponseField>
+
+  <ResponseField name="metadata" type="Record<string, unknown> | null">
+    Custom device metadata
+  </ResponseField>
+
+  <ResponseField name="lastSeenAt" type="string | null">
+    Timestamp when device was last seen
+  </ResponseField>
+
+  <ResponseField name="deviceToken" type="string | null">
+    Authentication token for the device
+  </ResponseField>
+
+  <ResponseField name="createdAt" type="string | null">
+    Creation timestamp
+  </ResponseField>
+
+  <ResponseField name="updatedAt" type="string | null">
+    Last update timestamp
+  </ResponseField>
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether more results are available
+</ResponseField>
+
+## Register device
+
+Register a new device to your fleet.
+
+```typescript
+const device = await client.fleet.devices.register(options);
+```
+
+### Parameters
+
+<ParamField path="options" type="RegisterDeviceOptions" required>
+  Device registration details
+
+  <ParamField path="name" type="string" required>
+    Device name
+  </ParamField>
+
+  <ParamField path="type" type="string" required>
+    Device type
+  </ParamField>
+
+  <ParamField path="firmwareVersion" type="string" optional>
+    Firmware version
+  </ParamField>
+
+  <ParamField path="tags" type="string[]" optional>
+    Device tags for categorization
+  </ParamField>
+
+  <ParamField path="metadata" type="Record<string, unknown>" optional>
+    Custom device metadata
+  </ParamField>
+</ParamField>
+
+### Returns
+
+<ResponseField name="FleetDevice" type="object">
+  The newly registered device
+</ResponseField>
+
+## Get device
+
+Retrieve a specific device by UID.
+
+```typescript
+const device = await client.fleet.devices.get(uid);
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the device
+</ParamField>
+
+### Returns
+
+<ResponseField name="FleetDevice" type="object">
+  The requested device
+</ResponseField>
+
+## Update device
+
+Update an existing device.
+
+```typescript
+const device = await client.fleet.devices.update(uid, options);
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the device
+</ParamField>
+
+<ParamField path="options" type="UpdateDeviceOptions" required>
+  Fields to update
+
+  <ParamField path="name" type="string" optional>
+    Updated device name
+  </ParamField>
+
+  <ParamField path="status" type="string" optional>
+    Updated device status
+  </ParamField>
+
+  <ParamField path="firmwareVersion" type="string" optional>
+    Updated firmware version
+  </ParamField>
+
+  <ParamField path="tags" type="string[]" optional>
+    Updated device tags
+  </ParamField>
+
+  <ParamField path="metadata" type="Record<string, unknown>" optional>
+    Updated custom metadata
+  </ParamField>
+</ParamField>
+
+### Returns
+
+<ResponseField name="FleetDevice" type="object">
+  The updated device
+</ResponseField>
+
+## Delete device
+
+Delete a device from your fleet.
+
+```typescript
+await client.fleet.devices.delete(uid);
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the device to delete
+</ParamField>
+
+### Returns
+
+Returns `void` on success.

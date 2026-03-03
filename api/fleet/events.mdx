@@ -1,0 +1,232 @@
+---
+title: Fleet events
+description: Create and track events from device recordings
+---
+
+The Fleet Events resource allows you to create, retrieve, and manage events associated with device recordings.
+
+## List events
+
+Retrieve a paginated list of fleet events.
+
+```typescript
+const events = await client.fleet.events.list(options?);
+```
+
+### Parameters
+
+<ParamField path="options" type="ListEventsOptions" optional>
+  Optional filtering and pagination parameters
+
+  <ParamField path="recording" type="string" optional>
+    Filter events by recording UID
+  </ParamField>
+
+  <ParamField path="device" type="string" optional>
+    Filter events by device UID
+  </ParamField>
+
+  <ParamField path="type" type="string" optional>
+    Filter events by type
+  </ParamField>
+
+  <ParamField path="severity" type="string" optional>
+    Filter events by severity level
+  </ParamField>
+
+  <ParamField path="limit" type="number" optional>
+    Maximum number of events to return per page
+  </ParamField>
+
+  <ParamField path="cursor" type="string" optional>
+    Cursor for pagination
+  </ParamField>
+</ParamField>
+
+### Returns
+
+<ResponseField name="items" type="FleetEvent[]">
+  Array of fleet events
+
+  <ResponseField name="uid" type="string">
+    Unique identifier for the event
+  </ResponseField>
+
+  <ResponseField name="recording" type="string | null">
+    UID of the associated recording
+  </ResponseField>
+
+  <ResponseField name="device" type="string | null">
+    UID of the associated device
+  </ResponseField>
+
+  <ResponseField name="type" type="string | null">
+    Event type
+  </ResponseField>
+
+  <ResponseField name="label" type="string | null">
+    Event label
+  </ResponseField>
+
+  <ResponseField name="description" type="string | null">
+    Event description
+  </ResponseField>
+
+  <ResponseField name="timestamp" type="string | null">
+    Event timestamp
+  </ResponseField>
+
+  <ResponseField name="durationMs" type="number | null">
+    Event duration in milliseconds
+  </ResponseField>
+
+  <ResponseField name="tags" type="string[]">
+    Event tags
+  </ResponseField>
+
+  <ResponseField name="metadata" type="Record<string, unknown> | null">
+    Custom event metadata
+  </ResponseField>
+
+  <ResponseField name="severity" type="string | null">
+    Event severity level
+  </ResponseField>
+
+  <ResponseField name="createdAt" type="string | null">
+    Creation timestamp
+  </ResponseField>
+
+  <ResponseField name="updatedAt" type="string | null">
+    Last update timestamp
+  </ResponseField>
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether more results are available
+</ResponseField>
+
+## Create event
+
+Create a new fleet event.
+
+```typescript
+const event = await client.fleet.events.create(options);
+```
+
+### Parameters
+
+<ParamField path="options" type="CreateEventOptions" required>
+  Event creation details
+
+  <ParamField path="recording" type="string" required>
+    UID of the associated recording
+  </ParamField>
+
+  <ParamField path="device" type="string" required>
+    UID of the associated device
+  </ParamField>
+
+  <ParamField path="label" type="string" required>
+    Event label
+  </ParamField>
+
+  <ParamField path="type" type="string" required>
+    Event type
+  </ParamField>
+
+  <ParamField path="timestamp" type="string" required>
+    Event timestamp (ISO 8601 format)
+  </ParamField>
+
+  <ParamField path="description" type="string" optional>
+    Event description
+  </ParamField>
+
+  <ParamField path="durationMs" type="number" optional>
+    Event duration in milliseconds
+  </ParamField>
+
+  <ParamField path="tags" type="string[]" optional>
+    Event tags
+  </ParamField>
+
+  <ParamField path="metadata" type="Record<string, unknown>" optional>
+    Custom event metadata
+  </ParamField>
+
+  <ParamField path="severity" type="string" optional>
+    Event severity level
+  </ParamField>
+</ParamField>
+
+### Returns
+
+<ResponseField name="FleetEvent" type="object">
+  The newly created event
+</ResponseField>
+
+## Create batch events
+
+Create multiple events in a single request.
+
+```typescript
+const result = await client.fleet.events.createBatch(events);
+```
+
+### Parameters
+
+<ParamField path="events" type="CreateEventOptions[]" required>
+  Array of event creation options
+</ParamField>
+
+### Returns
+
+<ResponseField name="created" type="number">
+  Number of events successfully created
+</ResponseField>
+
+## Get event
+
+Retrieve a specific event by UID.
+
+```typescript
+const event = await client.fleet.events.get(uid);
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the event
+</ParamField>
+
+### Returns
+
+<ResponseField name="FleetEvent" type="object">
+  The requested event
+</ResponseField>
+
+## Delete event
+
+Delete an event from your fleet.
+
+```typescript
+await client.fleet.events.delete(uid);
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the event to delete
+</ParamField>
+
+### Returns
+
+Returns `void` on success.

@@ -1,0 +1,101 @@
+---
+title: Fleet management
+description: Manage your fleet of devices, recordings, and automated monitoring
+---
+
+The Fleet Management API allows you to manage devices, recordings, events, rules, and alerts for your fleet operations.
+
+## Resources
+
+The fleet resource provides access to the following sub-resources:
+
+- **Devices** - Register and manage fleet devices
+- **Recordings** - Access and manage device recordings
+- **Events** - Create and track events from recordings
+- **Rules** - Define automated monitoring rules
+- **Alerts** - Monitor and respond to triggered alerts
+- **Alert Channels** - Configure notification channels for alerts
+
+## Getting started
+
+Access the fleet resource through the Avala SDK client:
+
+```typescript
+import { Avala } from '@avala/sdk';
+
+const client = new Avala({ apiKey: 'your-api-key' });
+
+// Access fleet resources
+const devices = await client.fleet.devices.list();
+const recordings = await client.fleet.recordings.list();
+```
+
+## Common patterns
+
+### Device registration
+
+Register a new device to your fleet:
+
+```typescript
+const device = await client.fleet.devices.register({
+  name: 'Vehicle-001',
+  type: 'autonomous_vehicle',
+  firmwareVersion: '2.1.0',
+  tags: ['production', 'zone-a']
+});
+```
+
+### Event tracking
+
+Create events from device recordings:
+
+```typescript
+const event = await client.fleet.events.create({
+  recording: 'rec_abc123',
+  device: 'dev_xyz789',
+  label: 'Hard Braking',
+  type: 'safety',
+  timestamp: '2026-03-03T10:30:00Z',
+  severity: 'warning'
+});
+```
+
+### Automated monitoring
+
+Create rules to automatically monitor your fleet:
+
+```typescript
+const rule = await client.fleet.rules.create({
+  name: 'High Temperature Alert',
+  condition: {
+    field: 'metadata.temperature',
+    operator: 'greater_than',
+    value: 80
+  },
+  actions: [
+    {
+      type: 'create_alert',
+      severity: 'critical'
+    }
+  ],
+  enabled: true
+});
+```
+
+## Pagination
+
+All list methods return cursor-based paginated results:
+
+```typescript
+const page = await client.fleet.devices.list({ limit: 50 });
+
+for (const device of page.items) {
+  console.log(device.name);
+}
+
+if (page.hasMore) {
+  const nextPage = await client.fleet.devices.list({
+    cursor: page.nextCursor
+  });
+}
+```

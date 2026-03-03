@@ -1,0 +1,326 @@
+---
+title: Quality targets
+description: Set and monitor quality metrics for your annotation projects
+---
+
+Quality targets allow you to define thresholds for quality metrics and automatically monitor your annotation projects. Configure alerts to notify your team when quality targets are breached.
+
+## List quality targets
+
+Retrieve all quality targets for a project.
+
+```typescript
+const targets = await avala.qualityTargets.list('project-uid', {
+  limit: 50,
+  cursor: 'next-cursor'
+});
+```
+
+### Parameters
+
+<ParamField path="projectUid" type="string" required>
+  The unique identifier of the project
+</ParamField>
+
+<ParamField path="options.limit" type="number" optional>
+  Maximum number of targets to return per page
+</ParamField>
+
+<ParamField path="options.cursor" type="string" optional>
+  Cursor for pagination
+</ParamField>
+
+### Returns
+
+Returns a cursor-paginated list of quality target objects.
+
+<ResponseField name="items" type="QualityTarget[]">
+  Array of quality target objects
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether more results are available
+</ResponseField>
+
+## Create a quality target
+
+Create a new quality target for a project.
+
+```typescript
+const target = await avala.qualityTargets.create('project-uid', {
+  name: 'Minimum Accuracy',
+  metric: 'accuracy',
+  operator: 'gte',
+  threshold: 0.95,
+  severity: 'high',
+  isActive: true,
+  notifyWebhook: true,
+  notifyEmails: ['team@example.com']
+});
+```
+
+### Parameters
+
+<ParamField path="projectUid" type="string" required>
+  The unique identifier of the project
+</ParamField>
+
+<ParamField path="options.name" type="string" required>
+  Name of the quality target
+</ParamField>
+
+<ParamField path="options.metric" type="string" required>
+  Metric to monitor (e.g., 'accuracy', 'precision', 'recall', 'f1_score')
+</ParamField>
+
+<ParamField path="options.operator" type="string" required>
+  Comparison operator ('gte' for greater than or equal, 'lte' for less than or equal, 'gt' for greater than, 'lt' for less than, 'eq' for equal)
+</ParamField>
+
+<ParamField path="options.threshold" type="number" required>
+  Threshold value for the metric
+</ParamField>
+
+<ParamField path="options.severity" type="string" optional>
+  Severity level when breached (e.g., 'low', 'medium', 'high', 'critical')
+</ParamField>
+
+<ParamField path="options.isActive" type="boolean" optional>
+  Whether the target is active
+</ParamField>
+
+<ParamField path="options.notifyWebhook" type="boolean" optional>
+  Whether to send webhook notifications when breached
+</ParamField>
+
+<ParamField path="options.notifyEmails" type="string[]" optional>
+  Email addresses to notify when breached
+</ParamField>
+
+### Returns
+
+Returns the created quality target object.
+
+<ResponseField name="uid" type="string">
+  Unique identifier for the target
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Name of the target
+</ResponseField>
+
+<ResponseField name="metric" type="string">
+  Metric being monitored
+</ResponseField>
+
+<ResponseField name="operator" type="string">
+  Comparison operator
+</ResponseField>
+
+<ResponseField name="threshold" type="number">
+  Threshold value
+</ResponseField>
+
+<ResponseField name="severity" type="string | null">
+  Severity level
+</ResponseField>
+
+<ResponseField name="isActive" type="boolean">
+  Whether the target is active
+</ResponseField>
+
+<ResponseField name="notifyWebhook" type="boolean">
+  Whether webhook notifications are enabled
+</ResponseField>
+
+<ResponseField name="notifyEmails" type="string[]">
+  Email notification recipients
+</ResponseField>
+
+<ResponseField name="lastEvaluatedAt" type="string | null">
+  ISO 8601 timestamp of last evaluation
+</ResponseField>
+
+<ResponseField name="lastValue" type="number | null">
+  Last measured value
+</ResponseField>
+
+<ResponseField name="isBreached" type="boolean">
+  Whether the target is currently breached
+</ResponseField>
+
+<ResponseField name="breachCount" type="number">
+  Number of times the target has been breached
+</ResponseField>
+
+<ResponseField name="lastBreachedAt" type="string | null">
+  ISO 8601 timestamp of last breach
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null">
+  ISO 8601 timestamp of creation
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null">
+  ISO 8601 timestamp of last update
+</ResponseField>
+
+## Get a quality target
+
+Retrieve a specific quality target.
+
+```typescript
+const target = await avala.qualityTargets.get('project-uid', 'target-uid');
+```
+
+### Parameters
+
+<ParamField path="projectUid" type="string" required>
+  The unique identifier of the project
+</ParamField>
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the quality target
+</ParamField>
+
+### Returns
+
+Returns the quality target object.
+
+## Update a quality target
+
+Update an existing quality target.
+
+```typescript
+const target = await avala.qualityTargets.update('project-uid', 'target-uid', {
+  threshold: 0.98,
+  isActive: false,
+  severity: 'critical'
+});
+```
+
+### Parameters
+
+<ParamField path="projectUid" type="string" required>
+  The unique identifier of the project
+</ParamField>
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the target to update
+</ParamField>
+
+<ParamField path="options.name" type="string" optional>
+  New name for the target
+</ParamField>
+
+<ParamField path="options.metric" type="string" optional>
+  New metric to monitor
+</ParamField>
+
+<ParamField path="options.operator" type="string" optional>
+  New comparison operator
+</ParamField>
+
+<ParamField path="options.threshold" type="number" optional>
+  New threshold value
+</ParamField>
+
+<ParamField path="options.severity" type="string" optional>
+  New severity level
+</ParamField>
+
+<ParamField path="options.isActive" type="boolean" optional>
+  Whether the target should be active
+</ParamField>
+
+<ParamField path="options.notifyWebhook" type="boolean" optional>
+  Whether to enable webhook notifications
+</ParamField>
+
+<ParamField path="options.notifyEmails" type="string[]" optional>
+  New email notification recipients
+</ParamField>
+
+### Returns
+
+Returns the updated quality target object.
+
+## Delete a quality target
+
+Delete a quality target.
+
+```typescript
+await avala.qualityTargets.delete('project-uid', 'target-uid');
+```
+
+### Parameters
+
+<ParamField path="projectUid" type="string" required>
+  The unique identifier of the project
+</ParamField>
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the target to delete
+</ParamField>
+
+### Returns
+
+Returns void on success.
+
+## Evaluate quality targets
+
+Evaluate all quality targets for a project and get current results.
+
+```typescript
+const evaluations = await avala.qualityTargets.evaluate('project-uid');
+```
+
+### Parameters
+
+<ParamField path="projectUid" type="string" required>
+  The unique identifier of the project
+</ParamField>
+
+### Returns
+
+Returns an array of quality target evaluation results.
+
+<ResponseField name="[].uid" type="string">
+  Quality target UID
+</ResponseField>
+
+<ResponseField name="[].name" type="string">
+  Target name
+</ResponseField>
+
+<ResponseField name="[].metric" type="string">
+  Metric name
+</ResponseField>
+
+<ResponseField name="[].threshold" type="number">
+  Threshold value
+</ResponseField>
+
+<ResponseField name="[].operator" type="string">
+  Comparison operator
+</ResponseField>
+
+<ResponseField name="[].currentValue" type="number">
+  Current measured value
+</ResponseField>
+
+<ResponseField name="[].isBreached" type="boolean">
+  Whether the target is breached
+</ResponseField>
+
+<ResponseField name="[].severity" type="string | null">
+  Severity level
+</ResponseField>

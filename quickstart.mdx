@@ -1,80 +1,270 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick start
+description: Make your first API call with the Avala TypeScript SDK
 ---
 
-## Get started in three steps
+## Overview
 
-Get your documentation site running locally and make your first customization.
+This guide will walk you through making your first API calls with the Avala SDK. You'll learn how to initialize the client, list datasets, create exports, and handle responses.
 
-### Step 1: Set up your local environment
+<Note>
+  Make sure you've [installed the SDK](/installation) and have an API key ready. If you don't have an API key yet, see [Authentication](/authentication).
+</Note>
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+## Initialize the client
+
+First, set your API key as an environment variable:
+
+```bash
+export AVALA_API_KEY="avk_your_api_key"
+```
+
+Then import and initialize the Avala client:
+
+```typescript
+import Avala from "@avala-ai/sdk";
+
+const avala = new Avala();
+```
+
+<Tip>
+  The client automatically reads your API key from the `AVALA_API_KEY` environment variable. You can also pass it explicitly: `new Avala({ apiKey: "avk_..." })`
+</Tip>
+
+## List datasets
+
+Let's start by listing your available datasets:
+
+```typescript
+const page = await avala.datasets.list({ limit: 10 });
+
+page.items.forEach(dataset => {
+  console.log(`${dataset.uid} - ${dataset.name}`);
+  console.log(`  Items: ${dataset.itemCount}`);
+  console.log(`  Type: ${dataset.dataType}`);
+});
+```
+
+<CodeGroup>
+
+```typescript With pagination
+let page = await avala.datasets.list({ limit: 20 });
+
+for (const dataset of page.items) {
+  console.log(dataset.name);
+}
+
+// Load next page if available
+if (page.hasMore) {
+  const nextPage = await avala.datasets.list({ 
+    cursor: page.nextCursor 
+  });
+}
+```
+
+```typescript Iterate all datasets
+let cursor: string | null = null;
+
+do {
+  const page = await avala.datasets.list({ 
+    limit: 50, 
+    cursor: cursor ?? undefined 
+  });
+  
+  page.items.forEach(d => console.log(d.name));
+  
+  cursor = page.nextCursor;
+} while (cursor);
+```
+
+</CodeGroup>
+
+## Get a specific dataset
+
+Retrieve detailed information about a single dataset:
+
+```typescript
+const dataset = await avala.datasets.get("dataset-uid");
+
+console.log(`Dataset: ${dataset.name}`);
+console.log(`Slug: ${dataset.slug}`);
+console.log(`Items: ${dataset.itemCount}`);
+console.log(`Created: ${dataset.createdAt}`);
+```
+
+## Create an export
+
+Exports allow you to download annotated data from a project:
+
+```typescript
+const exp = await avala.exports.create({ 
+  project: "project-uid" 
+});
+
+console.log(`Export UID: ${exp.uid}`);
+console.log(`Status: ${exp.status}`);
+```
+
+<Steps>
+  <Step title="Create the export">
+    Call `avala.exports.create()` with a project UID to start a new export.
+  </Step>
+  <Step title="Poll for completion">
+    The export processes asynchronously. Poll `avala.exports.get(exp.uid)` until `status` is `"completed"`.
+  </Step>
+  <Step title="Download the data">
+    Once complete, use the `downloadUrl` field to retrieve your annotated data.
+  </Step>
+</Steps>
+
+## List tasks with filters
+
+Query tasks with filters to find specific annotation work:
+
+```typescript
+const tasks = await avala.tasks.list({
+  project: "project-uid",
+  status: "completed",
+  limit: 25
+});
+
+tasks.items.forEach(task => {
+  console.log(`${task.name} (${task.status})`);
+});
+```
+
+## Complete example
+
+Here's a complete working example that ties everything together:
+
+```typescript
+import Avala from "@avala-ai/sdk";
+
+const avala = new Avala();
+
+async function main() {
+  // List datasets
+  console.log("📊 Fetching datasets...");
+  const datasets = await avala.datasets.list({ limit: 5 });
+  
+  console.log(`Found ${datasets.items.length} datasets:\n`);
+  datasets.items.forEach(d => {
+    console.log(`  • ${d.name} (${d.itemCount} items)`);
+  });
+
+  // Get a specific dataset
+  if (datasets.items.length > 0) {
+    const firstDataset = datasets.items[0];
+    console.log(`\n🔍 Fetching details for "${firstDataset.name}"...`);
     
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+    const dataset = await avala.datasets.get(firstDataset.uid);
+    console.log(`  Slug: ${dataset.slug}`);
+    console.log(`  Type: ${dataset.dataType}`);
+  }
 
-### Step 2: Deploy your changes
+  // List projects
+  console.log("\n📁 Fetching projects...");
+  const projects = await avala.projects.list({ limit: 5 });
+  
+  console.log(`Found ${projects.items.length} projects:\n`);
+  projects.items.forEach(p => {
+    console.log(`  • ${p.name} (${p.status})`);
+  });
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+  // Create an export (uncomment to test)
+  // if (projects.items.length > 0) {
+  //   const exp = await avala.exports.create({ 
+  //     project: projects.items[0].uid 
+  //   });
+  //   console.log(`\n📦 Created export: ${exp.uid}`);
+  // }
+}
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+main().catch(console.error);
+```
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+<Tip>
+  Save this example as `example.ts`, run `npx tsx example.ts` (after installing `tsx`), and watch it fetch your Avala data!
+</Tip>
 
-### Step 3: Go live
+## Error handling
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+The SDK throws typed errors for different failure scenarios:
+
+```typescript
+import Avala, { 
+  AvalaError, 
+  NotFoundError, 
+  RateLimitError,
+  AuthenticationError 
+} from "@avala-ai/sdk";
+
+const avala = new Avala();
+
+try {
+  const dataset = await avala.datasets.get("nonexistent-uid");
+} catch (error) {
+  if (error instanceof NotFoundError) {
+    console.log("Dataset not found");
+  } else if (error instanceof RateLimitError) {
+    console.log(`Rate limited. Retry after ${error.retryAfter}s`);
+  } else if (error instanceof AuthenticationError) {
+    console.log("Invalid API key");
+  } else if (error instanceof AvalaError) {
+    console.log(`API error: ${error.message}`);
+    console.log(`Status code: ${error.statusCode}`);
+  } else {
+    throw error; // Re-throw non-Avala errors
+  }
+}
+```
+
+<Note>
+  All SDK errors extend `AvalaError`, which includes `statusCode` and `body` properties for debugging.
+</Note>
+
+## Rate limit information
+
+Access rate limit details from the last API response:
+
+```typescript
+const datasets = await avala.datasets.list();
+
+const rateLimit = avala.rateLimitInfo;
+console.log(`Limit: ${rateLimit.limit}`);
+console.log(`Remaining: ${rateLimit.remaining}`);
+console.log(`Reset: ${rateLimit.reset}`);
+```
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card
+    title="Explore resources"
+    icon="book"
+    href="/api-reference/overview"
+  >
+    Discover all available resources: projects, exports, tasks, agents, and more
+  </Card>
+  <Card
+    title="Advanced features"
+    icon="wand-magic-sparkles"
+    href="/advanced/pagination"
+  >
+    Learn about pagination, filtering, error handling, and more
+  </Card>
+  <Card
+    title="Code examples"
+    icon="code"
+    href="/resources/examples"
+  >
+    Browse practical examples for common use cases
+  </Card>
+  <Card
+    title="API reference"
+    icon="book-open"
+    href="https://docs.avala.ai/api-reference/overview"
+  >
+    View the complete API documentation
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

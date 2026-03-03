@@ -1,0 +1,252 @@
+---
+title: Webhooks
+description: Manage webhooks and webhook deliveries for event notifications
+---
+
+Webhooks allow you to receive real-time notifications when events occur in your Avala account.
+
+## Webhooks
+
+### List webhooks
+
+Retrieve a paginated list of all webhooks.
+
+```typescript
+await avala.webhooks.list(options?)
+```
+
+<ParamField path="options" type="object">
+  Optional parameters for pagination.
+  
+  <ParamField path="limit" type="number">
+    Maximum number of webhooks to return per page.
+  </ParamField>
+  
+  <ParamField path="cursor" type="string">
+    Cursor for pagination to fetch the next page of results.
+  </ParamField>
+</ParamField>
+
+<ResponseField name="items" type="Webhook[]">
+  Array of webhook objects.
+  
+  <ResponseField name="uid" type="string">
+    Unique identifier for the webhook.
+  </ResponseField>
+  
+  <ResponseField name="targetUrl" type="string">
+    The URL where webhook events will be sent.
+  </ResponseField>
+  
+  <ResponseField name="events" type="string[]">
+    Array of event types this webhook subscribes to.
+  </ResponseField>
+  
+  <ResponseField name="isActive" type="boolean">
+    Whether the webhook is currently active.
+  </ResponseField>
+  
+  <ResponseField name="createdAt" type="string | null">
+    Timestamp when the webhook was created.
+  </ResponseField>
+  
+  <ResponseField name="updatedAt" type="string | null">
+    Timestamp when the webhook was last updated.
+  </ResponseField>
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results.
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results.
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether there are more results available.
+</ResponseField>
+
+### Create webhook
+
+Create a new webhook subscription.
+
+```typescript
+await avala.webhooks.create(options)
+```
+
+<ParamField path="options" type="object" required>
+  <ParamField path="targetUrl" type="string" required>
+    The URL where webhook events will be sent.
+  </ParamField>
+  
+  <ParamField path="events" type="string[]" required>
+    Array of event types to subscribe to (e.g., ["dataset.created", "project.completed"]).
+  </ParamField>
+  
+  <ParamField path="isActive" type="boolean">
+    Whether the webhook should be active immediately. Defaults to true.
+  </ParamField>
+</ParamField>
+
+### Get webhook
+
+Retrieve a specific webhook by its unique identifier.
+
+```typescript
+await avala.webhooks.get(uid)
+```
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the webhook to retrieve.
+</ParamField>
+
+### Update webhook
+
+Update an existing webhook.
+
+```typescript
+await avala.webhooks.update(uid, options)
+```
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the webhook to update.
+</ParamField>
+
+<ParamField path="options" type="object" required>
+  <ParamField path="targetUrl" type="string">
+    The URL where webhook events will be sent.
+  </ParamField>
+  
+  <ParamField path="events" type="string[]">
+    Array of event types to subscribe to.
+  </ParamField>
+  
+  <ParamField path="isActive" type="boolean">
+    Whether the webhook is active.
+  </ParamField>
+</ParamField>
+
+### Delete webhook
+
+Delete a webhook.
+
+```typescript
+await avala.webhooks.delete(uid)
+```
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the webhook to delete.
+</ParamField>
+
+### Test webhook
+
+Send a test event to verify webhook configuration.
+
+```typescript
+await avala.webhooks.test(uid)
+```
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the webhook to test.
+</ParamField>
+
+<ResponseField name="success" type="boolean">
+  Whether the test was successful.
+</ResponseField>
+
+## Webhook deliveries
+
+The `WebhookDeliveriesResource` provides methods to track and inspect webhook delivery attempts.
+
+### List webhook deliveries
+
+Retrieve a paginated list of webhook delivery attempts.
+
+```typescript
+await avala.webhookDeliveries.list(options?)
+```
+
+<ParamField path="options" type="object">
+  Optional parameters for pagination.
+  
+  <ParamField path="limit" type="number">
+    Maximum number of deliveries to return per page.
+  </ParamField>
+  
+  <ParamField path="cursor" type="string">
+    Cursor for pagination to fetch the next page of results.
+  </ParamField>
+</ParamField>
+
+<ResponseField name="items" type="WebhookDelivery[]">
+  Array of webhook delivery objects.
+  
+  <ResponseField name="uid" type="string">
+    Unique identifier for the delivery.
+  </ResponseField>
+  
+  <ResponseField name="subscription" type="string">
+    UID of the webhook subscription.
+  </ResponseField>
+  
+  <ResponseField name="eventType" type="string">
+    Type of event that triggered the delivery.
+  </ResponseField>
+  
+  <ResponseField name="payload" type="object">
+    Event payload that was sent.
+  </ResponseField>
+  
+  <ResponseField name="responseStatus" type="number | null">
+    HTTP status code returned by the target URL.
+  </ResponseField>
+  
+  <ResponseField name="responseBody" type="string | null">
+    Response body from the target URL.
+  </ResponseField>
+  
+  <ResponseField name="attempts" type="number">
+    Number of delivery attempts made.
+  </ResponseField>
+  
+  <ResponseField name="nextRetryAt" type="string | null">
+    Timestamp for the next retry attempt if applicable.
+  </ResponseField>
+  
+  <ResponseField name="status" type="string | null">
+    Current status of the delivery (e.g., "pending", "delivered", "failed").
+  </ResponseField>
+  
+  <ResponseField name="createdAt" type="string | null">
+    Timestamp when the delivery was created.
+  </ResponseField>
+  
+  <ResponseField name="updatedAt" type="string | null">
+    Timestamp when the delivery was last updated.
+  </ResponseField>
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results.
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results.
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether there are more results available.
+</ResponseField>
+
+### Get webhook delivery
+
+Retrieve details about a specific webhook delivery attempt.
+
+```typescript
+await avala.webhookDeliveries.get(uid)
+```
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the delivery to retrieve.
+</ParamField>

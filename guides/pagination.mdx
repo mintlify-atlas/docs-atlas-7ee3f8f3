@@ -1,0 +1,329 @@
+---
+title: Pagination
+description: Efficiently iterate through large datasets with cursor-based pagination
+---
+
+The Avala SDK uses cursor-based pagination for list endpoints, allowing you to efficiently iterate through large result sets.
+
+## Basic pagination
+
+List endpoints return a `CursorPage` object with items and pagination cursors:
+
+```typescript
+const page = await avala.datasets.list();
+
+console.log('Items:', page.items);
+console.log('Has more:', page.hasMore);
+console.log('Next cursor:', page.nextCursor);
+console.log('Previous cursor:', page.previousCursor);
+```
+
+### CursorPage interface
+
+The `CursorPage` type is defined in the SDK:
+
+```typescript
+interface CursorPage<T> {
+  items: T[];              // Current page of items
+  nextCursor: string | null;      // Cursor for next page
+  previousCursor: string | null;  // Cursor for previous page
+  hasMore: boolean;               // Whether more items exist
+}
+```
+
+## Fetching the next page
+
+Use the `nextCursor` to fetch subsequent pages:
+
+```typescript
+let cursor: string | null = null;
+const allDatasets = [];
+
+do {
+  const page = await avala.datasets.list({ cursor });
+  allDatasets.push(...page.items);
+  cursor = page.nextCursor;
+} while (cursor !== null);
+
+console.log('Total datasets:', allDatasets.length);
+```
+
+<Warning>
+Fetching all pages can be slow for large datasets. Consider processing items incrementally instead.
+</Warning>
+
+## Iterating through pages
+
+<Steps>
+<Step title="Start with the first page">
+  Call the list method without a cursor:
+
+  ```typescript
+  const firstPage = await avala.datasets.list();
+  console.log('First page:', firstPage.items.length, 'items');
+  ```
+</Step>
+
+<Step title="Check if more pages exist">
+  Use the `hasMore` property to determine if there are more pages:
+
+  ```typescript
+  if (firstPage.hasMore) {
+    console.log('More pages available');
+    console.log('Next cursor:', firstPage.nextCursor);
+  }
+  ```
+</Step>
+
+<Step title="Fetch subsequent pages">
+  Pass the `nextCursor` to get the next page:
+
+  ```typescript
+  const secondPage = await avala.datasets.list({
+    cursor: firstPage.nextCursor
+  });
+  
+  console.log('Second page:', secondPage.items.length, 'items');
+  ```
+</Step>
+</Steps>
+
+## Processing all items
+
+Here's a complete example that processes all items across pages:
+
+<CodeGroup>
+```typescript Async generator
+async function* iterateDatasets(avala: Avala) {
+  let cursor: string | null = null;
+  
+  do {
+    const page = await avala.datasets.list({ cursor });
+    
+    for (const dataset of page.items) {
+      yield dataset;
+    }
+    
+    cursor = page.nextCursor;
+  } while (cursor !== null);
+}
+
+// Usage
+for await (const dataset of iterateDatasets(avala)) {
+  console.log('Processing:', dataset.name);
+}
+```
+
+```typescript Batch processing
+async function processAllDatasets(avala: Avala) {
+  let cursor: string | null = null;
+  let processedCount = 0;
+  
+  do {
+    const page = await avala.datasets.list({ cursor });
+    
+    // Process this batch
+    await Promise.all(
+      page.items.map(async (dataset) => {
+        // Process each dataset
+        console.log('Processing:', dataset.name);
+        processedCount++;
+      })
+    );
+    
+    cursor = page.nextCursor;
+    console.log(`Processed ${processedCount} datasets so far`);
+  } while (cursor !== null);
+  
+  return processedCount;
+}
+
+const total = await processAllDatasets(avala);
+console.log('Total processed:', total);
+```
+
+```typescript Collect all
+async function getAllDatasets(avala: Avala) {
+  const allDatasets = [];
+  let cursor: string | null = null;
+  
+  do {
+    const page = await avala.datasets.list({ cursor });
+    allDatasets.push(...page.items);
+    cursor = page.nextCursor;
+  } while (cursor !== null);
+  
+  return allDatasets;
+}
+
+const datasets = await getAllDatasets(avala);
+console.log('Total datasets:', datasets.length);
+```
+</CodeGroup>
+
+<Tip>
+Async generators provide the most memory-efficient way to process large result sets.
+</Tip>
+
+## Filtering with pagination
+
+Combine filters with pagination to process specific subsets:
+
+```typescript
+let cursor: string | null = null;
+const activeProjects = [];
+
+do {
+  const page = await avala.projects.list({
+    cursor,
+    status: 'active'
+  });
+  
+  activeProjects.push(...page.items);
+  cursor = page.nextCursor;
+} while (cursor !== null);
+
+console.log('Active projects:', activeProjects.length);
+```
+
+## Backward pagination
+
+Use the `previousCursor` to navigate backwards:
+
+```typescript
+const page3 = await avala.datasets.list({ cursor: 'cursor-3' });
+
+// Go back to page 2
+const page2 = await avala.datasets.list({
+  cursor: page3.previousCursor
+});
+
+console.log('Previous page:', page2.items);
+```
+
+<Note>
+The `previousCursor` is `null` when you're on the first page.
+</Note>
+
+## Implementation details
+
+The SDK handles cursor extraction automatically from API responses:
+
+```typescript http.ts:124-133
+// From the SDK source code
+async requestPage<T>(path: string, params?: Record<string, string>): Promise<CursorPage<T>> {
+  const raw = await this.request<RawPageResponse>("GET", path, { params });
+  const items = raw.results.map((item) => snakeToCamel(item) as T);
+  return {
+    items,
+    nextCursor: extractCursor(raw.next),
+    previousCursor: extractCursor(raw.previous),
+    hasMore: raw.next !== null,
+  };
+}
+```
+
+The cursor extraction supports both cursor-based and page-number pagination:
+
+```typescript http.ts:38-47
+function extractCursor(url: string | null): string | null {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    // Support both cursor-based and page-number pagination
+    return parsed.searchParams.get("cursor") ?? parsed.searchParams.get("page");
+  } catch {
+    return null;
+  }
+}
+```
+
+## Paginated resources
+
+These resources support cursor-based pagination:
+
+- `avala.datasets.list()`
+- `avala.projects.list()`
+- `avala.tasks.list()`
+- `avala.exports.list()`
+- `avala.agents.list()`
+- `avala.autoLabelJobs.list()`
+- `avala.qualityTargets.list()`
+- `avala.webhooks.list()`
+- `avala.webhookDeliveries.list()`
+- `avala.organizations.list()`
+- `avala.slices.list()`
+- `avala.fleet.devices.list()`
+- `avala.fleet.recordings.list()`
+- `avala.fleet.events.list()`
+- `avala.fleet.rules.list()`
+- `avala.fleet.alerts.list()`
+
+## Best practices
+
+<Steps>
+<Step title="Process items incrementally">
+  Don't load all pages into memory at once:
+
+  ```typescript
+  // Good: Process as you go
+  let cursor: string | null = null;
+  do {
+    const page = await avala.datasets.list({ cursor });
+    await processDatasets(page.items);
+    cursor = page.nextCursor;
+  } while (cursor !== null);
+
+  // Bad: Load everything first
+  const allDatasets = [];
+  let cursor: string | null = null;
+  do {
+    const page = await avala.datasets.list({ cursor });
+    allDatasets.push(...page.items);
+    cursor = page.nextCursor;
+  } while (cursor !== null);
+  await processDatasets(allDatasets); // May run out of memory
+  ```
+</Step>
+
+<Step title="Handle errors gracefully">
+  Implement retry logic for failed page requests:
+
+  ```typescript
+  async function fetchAllWithRetry() {
+    let cursor: string | null = null;
+    const results = [];
+    
+    do {
+      try {
+        const page = await avala.datasets.list({ cursor });
+        results.push(...page.items);
+        cursor = page.nextCursor;
+      } catch (error) {
+        console.error('Failed to fetch page:', error);
+        // Retry with same cursor
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        continue;
+      }
+    } while (cursor !== null);
+    
+    return results;
+  }
+  ```
+</Step>
+
+<Step title="Set appropriate limits">
+  Use limit parameters if supported by the endpoint:
+
+  ```typescript
+  // Fetch smaller pages for faster initial response
+  const page = await avala.datasets.list({
+    limit: 10
+  });
+  ```
+</Step>
+</Steps>
+
+<Tip>
+For UI pagination, store both `nextCursor` and `previousCursor` to enable forward and backward navigation.
+</Tip>

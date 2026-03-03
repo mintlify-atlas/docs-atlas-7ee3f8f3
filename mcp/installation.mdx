@@ -1,0 +1,201 @@
+---
+title: Installation
+description: Install and set up the Avala MCP server for use with AI assistants
+---
+
+The Avala MCP server is distributed as an npm package and can be installed globally or used with npx.
+
+## Prerequisites
+
+<Steps>
+  <Step title="Node.js requirement">
+    The MCP server requires **Node.js 18 or higher**. Check your version:
+    
+    ```bash
+    node --version
+    ```
+    
+    If you need to install or update Node.js, visit [nodejs.org](https://nodejs.org).
+  </Step>
+
+  <Step title="Avala API key">
+    You'll need an Avala API key to authenticate requests. Get your key from the [Avala dashboard](https://avala.ai/settings/api-keys).
+    
+    <Warning>
+      Keep your API key secure. Never commit it to version control or share it publicly.
+    </Warning>
+  </Step>
+</Steps>
+
+## Installation options
+
+### Option 1: Install globally
+
+Install the MCP server as a global npm package:
+
+```bash
+npm install -g @avala-ai/mcp-server
+```
+
+Verify the installation:
+
+```bash
+avala-mcp-server --version
+```
+
+### Option 2: Use with npx
+
+Run the server directly without installing:
+
+```bash
+npx @avala-ai/mcp-server
+```
+
+<Note>
+Using npx is recommended for testing and one-off usage. For production integrations, install globally for better performance.
+</Note>
+
+## Configure your AI assistant
+
+The MCP server uses stdio (standard input/output) for communication. Configuration varies by client:
+
+<Tabs>
+  <Tab title="Claude Desktop">
+    Add the Avala MCP server to your Claude Desktop configuration file.
+
+    **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+    
+    **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+    ```json
+    {
+      "mcpServers": {
+        "avala": {
+          "command": "npx",
+          "args": ["-y", "@avala-ai/mcp-server"],
+          "env": {
+            "AVALA_API_KEY": "your-api-key-here"
+          }
+        }
+      }
+    }
+    ```
+
+    <Warning>
+      Replace `your-api-key-here` with your actual Avala API key.
+    </Warning>
+
+    If you installed globally, use the direct command:
+
+    ```json
+    {
+      "mcpServers": {
+        "avala": {
+          "command": "avala-mcp-server",
+          "env": {
+            "AVALA_API_KEY": "your-api-key-here"
+          }
+        }
+      }
+    }
+    ```
+
+    Restart Claude Desktop for changes to take effect.
+  </Tab>
+
+  <Tab title="Cline (VS Code)">
+    In VS Code with the Cline extension:
+
+    1. Open Cline settings (Command Palette → "Cline: Open Settings")
+    2. Navigate to the MCP Servers section
+    3. Add a new server configuration:
+
+    ```json
+    {
+      "name": "avala",
+      "command": "npx",
+      "args": ["-y", "@avala-ai/mcp-server"],
+      "env": {
+        "AVALA_API_KEY": "your-api-key-here"
+      }
+    }
+    ```
+
+    Save and reload VS Code.
+  </Tab>
+
+  <Tab title="Other clients">
+    For other MCP-compatible clients, configure an stdio transport with:
+
+    - **Command**: `npx` or `avala-mcp-server`
+    - **Args**: `["-y", "@avala-ai/mcp-server"]` (if using npx)
+    - **Environment**:
+      - `AVALA_API_KEY`: Your API key
+      - `AVALA_MCP_ENABLE_MUTATIONS`: `true` (optional, for write access)
+
+    Consult your client's documentation for specific configuration steps.
+  </Tab>
+</Tabs>
+
+## Verify the connection
+
+Once configured, test the connection by asking your AI assistant:
+
+<CodeGroup>
+```text Example prompts
+List my Avala datasets
+Show me my annotation projects
+Get workspace statistics
+```
+</CodeGroup>
+
+If the MCP server is properly configured, your assistant will use the Avala tools to respond with data from your workspace.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Authentication failed">
+    **Error**: `AVALA_API_KEY environment variable is required`
+
+    **Solution**: Verify that your API key is correctly set in the environment configuration. Check for:
+    - Typos in the environment variable name
+    - Missing or incorrect API key value
+    - Extra whitespace around the key
+  </Accordion>
+
+  <Accordion title="Command not found">
+    **Error**: `avala-mcp-server: command not found`
+
+    **Solution**: 
+    - If using npx, ensure you have internet connectivity
+    - If installed globally, verify npm's global bin directory is in your PATH
+    - Try reinstalling: `npm install -g @avala-ai/mcp-server`
+  </Accordion>
+
+  <Accordion title="Node version error">
+    **Error**: `This package requires Node.js 18 or higher`
+
+    **Solution**: Update Node.js to version 18 or later:
+    ```bash
+    # Using nvm (recommended)
+    nvm install 18
+    nvm use 18
+    ```
+  </Accordion>
+
+  <Accordion title="Server not responding">
+    **Problem**: AI assistant doesn't show Avala tools
+
+    **Solution**:
+    - Restart your AI assistant application
+    - Check the configuration file syntax (valid JSON)
+    - Review application logs for connection errors
+    - Test the server manually by running the command in your terminal
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<Card title="Configuration" icon="gear" href="/mcp/configuration">
+  Learn how to enable write operations and configure server options
+</Card>

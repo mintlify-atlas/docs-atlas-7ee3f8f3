@@ -1,0 +1,96 @@
+---
+title: MCP server overview
+description: Connect Avala to AI assistants and automation tools using the Model Context Protocol
+---
+
+The Avala MCP server enables AI assistants and automation tools to interact with your Avala workspace through the Model Context Protocol (MCP). This allows you to manage datasets, projects, tasks, and annotations directly from compatible AI tools like Claude Desktop, Cline, and other MCP-enabled applications.
+
+## What is MCP?
+
+The Model Context Protocol is an open standard for connecting AI systems to external data sources and tools. The Avala MCP server implements this protocol, providing a secure bridge between your AI assistant and the Avala API.
+
+## Key features
+
+The MCP server provides access to the full Avala platform:
+
+- **Dataset management** - List, create, and configure datasets for annotation
+- **Project operations** - Access project details, status, and configuration
+- **Task management** - Query and filter annotation tasks
+- **Automation agents** - Create and manage event-driven automation workflows
+- **Quality control** - Access annotation issues, quality targets, and consensus metrics
+- **Fleet management** - Monitor devices, recordings, events, and alerts
+- **Storage integration** - Configure S3 and Google Cloud Storage
+- **Webhooks** - Set up event notifications to external services
+- **Export operations** - Trigger and monitor annotation exports
+
+## Security model
+
+<Note>
+The MCP server runs in **read-only mode** by default. Write operations (create, update, delete) must be explicitly enabled.
+</Note>
+
+This two-tier security model protects your data:
+
+1. **Read-only mode** (default) - AI assistants can query and inspect your workspace without making changes
+2. **Mutations enabled** - When you explicitly enable write access, the server can create, update, and delete resources
+
+See the [Configuration guide](/mcp/configuration) for details on enabling write operations.
+
+## Architecture
+
+The MCP server acts as a stateless adapter between MCP clients and the Avala API:
+
+```
+AI Assistant (Claude, Cline, etc.)
+         ↓
+   MCP Protocol (stdio)
+         ↓
+  Avala MCP Server
+         ↓
+   Avala REST API
+         ↓
+   Your Workspace
+```
+
+- **Transport**: Standard input/output (stdio) for local communication
+- **Authentication**: API key passed via environment variable
+- **Data format**: JSON responses for all tool calls
+- **Pagination**: Cursor-based pagination for large result sets
+
+## Use cases
+
+<AccordionGroup>
+  <Accordion title="Dataset exploration">
+    Ask your AI assistant to find datasets by type, search for specific data, or summarize dataset statistics without writing custom scripts.
+  </Accordion>
+
+  <Accordion title="Project monitoring">
+    Query project status, check annotation progress, and review quality metrics through natural language conversations.
+  </Accordion>
+
+  <Accordion title="Automated workflows">
+    Create automation agents that respond to events like completed annotations or quality threshold violations.
+  </Accordion>
+
+  <Accordion title="Quality analysis">
+    Investigate annotation issues, review consensus scores, and evaluate quality targets across projects.
+  </Accordion>
+
+  <Accordion title="Fleet oversight">
+    Monitor device health, review recording status, and respond to alerts from your data collection fleet.
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/mcp/installation">
+    Install and configure the MCP server
+  </Card>
+  <Card title="Configuration" icon="gear" href="/mcp/configuration">
+    Configure authentication and permissions
+  </Card>
+  <Card title="Available tools" icon="wrench" href="/mcp/available-tools">
+    Browse all available MCP tools
+  </Card>
+</CardGroup>

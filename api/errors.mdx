@@ -1,0 +1,332 @@
+---
+title: Errors
+description: Error classes thrown by the Avala SDK
+---
+
+The Avala SDK throws specific error classes to help you handle different types of failures. All error classes extend the base `AvalaError` class.
+
+## Error hierarchy
+
+```
+AvalaError
+├── AuthenticationError
+├── NotFoundError
+├── RateLimitError
+├── ValidationError
+└── ServerError
+```
+
+## AvalaError
+
+Base error class for all Avala SDK errors.
+
+<ResponseField name="message" type="string" required>
+  Error message describing what went wrong.
+</ResponseField>
+
+<ResponseField name="statusCode" type="number | undefined" required>
+  HTTP status code associated with the error, if applicable.
+</ResponseField>
+
+<ResponseField name="body" type="unknown" required>
+  Raw response body from the API, if available.
+</ResponseField>
+
+### Example
+
+```typescript
+try {
+  const dataset = await avala.datasets.get("dataset-uid");
+} catch (error) {
+  if (error instanceof AvalaError) {
+    console.error(`Error ${error.statusCode}: ${error.message}`);
+    console.error("Response body:", error.body);
+  }
+}
+```
+
+## AuthenticationError
+
+Thrown when authentication fails (HTTP 401).
+
+<ResponseField name="message" type="string" required>
+  Error message describing the authentication failure.
+</ResponseField>
+
+<ResponseField name="statusCode" type="401" required>
+  Always set to 401 for authentication errors.
+</ResponseField>
+
+<ResponseField name="body" type="unknown" required>
+  Raw response body from the API.
+</ResponseField>
+
+### Common causes
+
+- Missing or invalid API key
+- Expired API key
+- Incorrect authentication credentials
+
+### Example
+
+```typescript
+import { Avala, AuthenticationError } from "@avala/sdk";
+
+const avala = new Avala({ apiKey: "invalid-key" });
+
+try {
+  const datasets = await avala.datasets.list();
+} catch (error) {
+  if (error instanceof AuthenticationError) {
+    console.error("Authentication failed. Please check your API key.");
+  }
+}
+```
+
+## NotFoundError
+
+Thrown when a requested resource is not found (HTTP 404).
+
+<ResponseField name="message" type="string" required>
+  Error message indicating the resource was not found.
+</ResponseField>
+
+<ResponseField name="statusCode" type="404" required>
+  Always set to 404 for not found errors.
+</ResponseField>
+
+<ResponseField name="body" type="unknown" required>
+  Raw response body from the API.
+</ResponseField>
+
+### Common causes
+
+- Invalid resource UID
+- Resource has been deleted
+- No access to the resource
+
+### Example
+
+```typescript
+import { Avala, NotFoundError } from "@avala/sdk";
+
+const avala = new Avala({ apiKey: process.env.AVALA_API_KEY });
+
+try {
+  const dataset = await avala.datasets.get("non-existent-uid");
+} catch (error) {
+  if (error instanceof NotFoundError) {
+    console.error("Dataset not found. Please check the UID.");
+  }
+}
+```
+
+## RateLimitError
+
+Thrown when the rate limit is exceeded (HTTP 429).
+
+<ResponseField name="message" type="string" required>
+  Error message indicating the rate limit was exceeded.
+</ResponseField>
+
+<ResponseField name="statusCode" type="429" required>
+  Always set to 429 for rate limit errors.
+</ResponseField>
+
+<ResponseField name="body" type="unknown" required>
+  Raw response body from the API.
+</ResponseField>
+
+<ResponseField name="retryAfter" type="number | null" required>
+  Number of seconds to wait before retrying, or null if not provided by the API.
+</ResponseField>
+
+### Example
+
+```typescript
+import { Avala, RateLimitError } from "@avala/sdk";
+
+const avala = new Avala({ apiKey: process.env.AVALA_API_KEY });
+
+try {
+  const datasets = await avala.datasets.list();
+} catch (error) {
+  if (error instanceof RateLimitError) {
+    const retryAfter = error.retryAfter ?? 60;
+    console.error(`Rate limit exceeded. Retry after ${retryAfter} seconds.`);
+    
+    // Wait and retry
+    await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+    const datasets = await avala.datasets.list();
+  }
+}
+```
+
+## ValidationError
+
+Thrown when request validation fails (HTTP 400 or similar).
+
+<ResponseField name="message" type="string" required>
+  Error message describing the validation failure.
+</ResponseField>
+
+<ResponseField name="statusCode" type="number" required>
+  HTTP status code (typically 400, but can be other 4xx codes).
+</ResponseField>
+
+<ResponseField name="body" type="unknown" required>
+  Raw response body from the API.
+</ResponseField>
+
+<ResponseField name="details" type="unknown[]" required>
+  Array of detailed validation errors, if provided by the API.
+</ResponseField>
+
+### Common causes
+
+- Missing required fields
+- Invalid field values
+- Invalid request parameters
+- Constraint violations
+
+### Example
+
+```typescript
+import { Avala, ValidationError } from "@avala/sdk";
+
+const avala = new Avala({ apiKey: process.env.AVALA_API_KEY });
+
+try {
+  const webhook = await avala.webhooks.create({
+    targetUrl: "invalid-url", // Invalid URL format
+    events: [],
+  });
+} catch (error) {
+  if (error instanceof ValidationError) {
+    console.error("Validation failed:", error.message);
+    console.error("Details:", error.details);
+  }
+}
+```
+
+## ServerError
+
+Thrown when a server-side error occurs (HTTP 5xx).
+
+<ResponseField name="message" type="string" required>
+  Error message describing the server error.
+</ResponseField>
+
+<ResponseField name="statusCode" type="number" required>
+  HTTP status code (5xx range).
+</ResponseField>
+
+<ResponseField name="body" type="unknown" required>
+  Raw response body from the API.
+</ResponseField>
+
+### Common causes
+
+- Internal server errors
+- Service unavailable
+- Gateway timeouts
+- Database errors
+
+### Example
+
+```typescript
+import { Avala, ServerError } from "@avala/sdk";
+
+const avala = new Avala({ apiKey: process.env.AVALA_API_KEY });
+
+try {
+  const dataset = await avala.datasets.get("dataset-uid");
+} catch (error) {
+  if (error instanceof ServerError) {
+    console.error(`Server error (${error.statusCode}): ${error.message}`);
+    console.error("Please try again later or contact support.");
+  }
+}
+```
+
+## Best practices
+
+### Handle specific error types
+
+Always check for specific error types to provide appropriate error handling:
+
+```typescript
+try {
+  const result = await avala.someOperation();
+} catch (error) {
+  if (error instanceof AuthenticationError) {
+    // Refresh credentials or prompt for login
+  } else if (error instanceof RateLimitError) {
+    // Implement backoff and retry
+  } else if (error instanceof ValidationError) {
+    // Show validation errors to user
+  } else if (error instanceof NotFoundError) {
+    // Handle missing resource
+  } else if (error instanceof ServerError) {
+    // Log and report to monitoring
+  } else {
+    // Handle unexpected errors
+  }
+}
+```
+
+### Implement retry logic
+
+For transient errors like rate limits and server errors:
+
+```typescript
+async function withRetry<T>(
+  operation: () => Promise<T>,
+  maxRetries = 3
+): Promise<T> {
+  let lastError: Error;
+  
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      
+      if (error instanceof RateLimitError) {
+        const delay = (error.retryAfter ?? Math.pow(2, i)) * 1000;
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else if (error instanceof ServerError) {
+        const delay = Math.pow(2, i) * 1000;
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        throw error; // Don't retry other errors
+      }
+    }
+  }
+  
+  throw lastError;
+}
+
+// Usage
+const datasets = await withRetry(() => avala.datasets.list());
+```
+
+### Log error details
+
+Always log the full error context for debugging:
+
+```typescript
+try {
+  const result = await avala.someOperation();
+} catch (error) {
+  if (error instanceof AvalaError) {
+    console.error({
+      message: error.message,
+      statusCode: error.statusCode,
+      body: error.body,
+      stack: error.stack,
+    });
+  }
+  throw error;
+}
+```

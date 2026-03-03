@@ -1,0 +1,134 @@
+---
+title: Configuration
+description: Configuration options for the Avala TypeScript SDK client
+---
+
+The Avala SDK client accepts configuration options to customize its behavior. Configuration is passed to the `Avala` constructor.
+
+## Configuration options
+
+<ParamField path="apiKey" type="string" optional>
+  Your Avala API key. This is required for authentication.
+  
+  If not provided, the SDK will attempt to read the `AVALA_API_KEY` environment variable. If neither is available, the constructor will throw an error.
+
+  ```typescript
+  const avala = new Avala({
+    apiKey: 'avala_key_abc123...'
+  });
+  ```
+</ParamField>
+
+<ParamField path="baseUrl" type="string" optional default="https://api.avala.ai/api/v1">
+  The base URL for the Avala API. This is typically used for:
+  - Testing against a staging environment
+  - Local development
+  - Self-hosted Avala instances
+
+  **Security requirements:**
+  - The URL must use HTTPS in production
+  - HTTP is only allowed for localhost addresses when `AVALA_ALLOW_INSECURE_BASE_URL=true` is set
+  - The SDK will throw an error if these requirements are not met
+
+  ```typescript
+  // Production or staging
+  const avala = new Avala({
+    apiKey: 'your-api-key',
+    baseUrl: 'https://staging-api.avala.ai/api/v1'
+  });
+
+  // Local development (requires environment variable)
+  // AVALA_ALLOW_INSECURE_BASE_URL=true
+  const avala = new Avala({
+    apiKey: 'your-api-key',
+    baseUrl: 'http://localhost:8000/api/v1'
+  });
+  ```
+</ParamField>
+
+<ParamField path="timeout" type="number" optional default={30000}>
+  Request timeout in milliseconds. Requests that take longer than this value will be aborted.
+
+  The default timeout is 30 seconds (30,000 milliseconds). You may want to increase this for:
+  - Large file uploads
+  - Batch operations
+  - Export generation
+  - Auto-labeling jobs
+
+  ```typescript
+  const avala = new Avala({
+    apiKey: 'your-api-key',
+    timeout: 60000 // 60 seconds
+  });
+  ```
+</ParamField>
+
+## Environment variables
+
+The SDK supports the following environment variables:
+
+### AVALA_API_KEY
+
+Your Avala API key. If not provided in the constructor config, the SDK will read this environment variable.
+
+```bash
+export AVALA_API_KEY="avala_key_abc123..."
+```
+
+```typescript
+// No need to pass apiKey in config
+const avala = new Avala();
+```
+
+### AVALA_ALLOW_INSECURE_BASE_URL
+
+Set to `true`, `1`, `yes`, or `on` to allow HTTP URLs for local development.
+
+**Warning:** This should only be used for local development. Never use insecure URLs in production.
+
+```bash
+export AVALA_ALLOW_INSECURE_BASE_URL=true
+```
+
+```typescript
+const avala = new Avala({
+  apiKey: 'your-api-key',
+  baseUrl: 'http://localhost:8000/api/v1'
+});
+```
+
+## Complete example
+
+Here's a complete example showing all configuration options:
+
+```typescript
+import { Avala } from '@avala/sdk';
+
+// Full configuration
+const avala = new Avala({
+  apiKey: 'avala_key_abc123...',
+  baseUrl: 'https://api.avala.ai/api/v1',
+  timeout: 60000
+});
+
+// Using environment variables
+// AVALA_API_KEY=avala_key_abc123...
+const avala = new Avala();
+
+// Override timeout only
+const avala = new Avala({
+  timeout: 120000 // 2 minutes
+});
+```
+
+## Type definition
+
+The full TypeScript interface for the configuration object:
+
+```typescript
+interface AvalaConfig {
+  apiKey?: string;
+  baseUrl?: string;
+  timeout?: number;
+}
+```

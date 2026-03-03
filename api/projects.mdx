@@ -1,0 +1,80 @@
+---
+title: Projects
+description: Manage projects in the Avala platform
+---
+
+The `ProjectsResource` provides methods to list and retrieve projects.
+
+## List projects
+
+Retrieve a paginated list of all projects.
+
+```typescript
+const response = await avala.projects.list({
+  limit: 50
+});
+```
+
+### Parameters
+
+<ParamField path="limit" type="number">
+  Maximum number of results to return
+</ParamField>
+
+<ParamField path="cursor" type="string">
+  Cursor for pagination
+</ParamField>
+
+### Returns
+
+<ResponseField name="items" type="Project[]">
+  Array of project objects
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether there are more results available
+</ResponseField>
+
+## Get a project
+
+Retrieve a specific project by its unique identifier.
+
+```typescript
+const project = await avala.projects.get("project_uid");
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the project
+</ParamField>
+
+### Returns
+
+<ResponseField name="uid" type="string">
+  The unique identifier for the project
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The name of the project
+</ResponseField>
+
+<ResponseField name="status" type="string | null">
+  The current status of the project
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null">
+  The timestamp when the project was created
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null">
+  The timestamp when the project was last updated
+</ResponseField>

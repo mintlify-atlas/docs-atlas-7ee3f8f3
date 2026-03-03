@@ -1,0 +1,418 @@
+---
+title: Annotation issues
+description: Track and manage quality control issues in your annotations
+---
+
+Annotation issues enable quality control by tracking problems found in annotations. Issues can be created at the sequence or dataset level and include details about the problem type, severity, and suggested fixes.
+
+## List issues by sequence
+
+Retrieve all annotation issues for a specific sequence.
+
+```typescript
+const issues = await avala.annotationIssues.listBySequence('sequence-uid', {
+  datasetItemUid: 'item-uid',
+  projectUid: 'project-uid'
+});
+```
+
+### Parameters
+
+<ParamField path="sequenceUid" type="string" required>
+  The unique identifier of the sequence
+</ParamField>
+
+<ParamField path="options.datasetItemUid" type="string" optional>
+  Filter by specific dataset item UID
+</ParamField>
+
+<ParamField path="options.projectUid" type="string" optional>
+  Filter by specific project UID
+</ParamField>
+
+### Returns
+
+Returns an array of annotation issue objects.
+
+## Create an annotation issue
+
+Create a new annotation issue for a sequence.
+
+```typescript
+const issue = await avala.annotationIssues.create('sequence-uid', {
+  toolUid: 'tool-uid',
+  problemUid: 'problem-uid',
+  datasetItemUid: 'item-uid',
+  projectUid: 'project-uid',
+  priority: 'high',
+  severity: 'critical',
+  description: 'Incorrect bounding box placement',
+  wrongClass: 'car',
+  correctClass: 'truck',
+  shouldReAnnotate: true,
+  shouldDelete: false,
+  framesAffected: '1-10',
+  coordinates: { x: 100, y: 200 },
+  objectUid: 'object-uid'
+});
+```
+
+### Parameters
+
+<ParamField path="sequenceUid" type="string" required>
+  The unique identifier of the sequence
+</ParamField>
+
+<ParamField path="options.toolUid" type="string" required>
+  UID of the annotation tool related to the issue
+</ParamField>
+
+<ParamField path="options.problemUid" type="string" required>
+  UID of the problem type
+</ParamField>
+
+<ParamField path="options.datasetItemUid" type="string" optional>
+  Dataset item UID where the issue was found
+</ParamField>
+
+<ParamField path="options.projectUid" type="string" optional>
+  Project UID where the issue was found
+</ParamField>
+
+<ParamField path="options.priority" type="string" optional>
+  Priority level of the issue (e.g., 'low', 'medium', 'high')
+</ParamField>
+
+<ParamField path="options.severity" type="string" optional>
+  Severity of the issue (e.g., 'minor', 'major', 'critical')
+</ParamField>
+
+<ParamField path="options.description" type="string" optional>
+  Detailed description of the issue
+</ParamField>
+
+<ParamField path="options.wrongClass" type="string" optional>
+  The incorrect class that was annotated
+</ParamField>
+
+<ParamField path="options.correctClass" type="string" optional>
+  The correct class that should be annotated
+</ParamField>
+
+<ParamField path="options.shouldReAnnotate" type="boolean" optional>
+  Whether the item should be re-annotated
+</ParamField>
+
+<ParamField path="options.shouldDelete" type="boolean" optional>
+  Whether the annotation should be deleted
+</ParamField>
+
+<ParamField path="options.framesAffected" type="string" optional>
+  Range of frames affected by the issue
+</ParamField>
+
+<ParamField path="options.coordinates" type="unknown" optional>
+  Coordinates of the issue location
+</ParamField>
+
+<ParamField path="options.queryParams" type="Record<string, unknown>" optional>
+  Additional query parameters
+</ParamField>
+
+<ParamField path="options.objectUid" type="string" optional>
+  UID of the specific object with the issue
+</ParamField>
+
+### Returns
+
+Returns the created annotation issue object.
+
+<ResponseField name="uid" type="string">
+  Unique identifier for the issue
+</ResponseField>
+
+<ResponseField name="datasetItemUid" type="string | null">
+  Dataset item UID
+</ResponseField>
+
+<ResponseField name="sequenceUid" type="string | null">
+  Sequence UID
+</ResponseField>
+
+<ResponseField name="project" type="object | null">
+  Project details
+</ResponseField>
+
+<ResponseField name="reporter" type="object | null">
+  User who reported the issue
+</ResponseField>
+
+<ResponseField name="priority" type="string | null">
+  Priority level
+</ResponseField>
+
+<ResponseField name="severity" type="string | null">
+  Severity level
+</ResponseField>
+
+<ResponseField name="description" type="string | null">
+  Issue description
+</ResponseField>
+
+<ResponseField name="status" type="string | null">
+  Current status of the issue
+</ResponseField>
+
+<ResponseField name="tool" type="object | null">
+  Tool details
+</ResponseField>
+
+<ResponseField name="problem" type="object | null">
+  Problem type details
+</ResponseField>
+
+<ResponseField name="wrongClass" type="string | null">
+  Incorrect class
+</ResponseField>
+
+<ResponseField name="correctClass" type="string | null">
+  Correct class
+</ResponseField>
+
+<ResponseField name="shouldReAnnotate" type="boolean | null">
+  Whether re-annotation is needed
+</ResponseField>
+
+<ResponseField name="shouldDelete" type="boolean | null">
+  Whether deletion is recommended
+</ResponseField>
+
+<ResponseField name="framesAffected" type="string | null">
+  Affected frame range
+</ResponseField>
+
+<ResponseField name="coordinates" type="unknown">
+  Location coordinates
+</ResponseField>
+
+<ResponseField name="queryParams" type="object | null">
+  Additional query parameters
+</ResponseField>
+
+<ResponseField name="objectUid" type="string | null">
+  Object UID
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null">
+  ISO 8601 timestamp of creation
+</ResponseField>
+
+<ResponseField name="closedAt" type="string | null">
+  ISO 8601 timestamp when closed
+</ResponseField>
+
+## Update an annotation issue
+
+Update an existing annotation issue.
+
+```typescript
+const issue = await avala.annotationIssues.update('sequence-uid', 'issue-uid', {
+  status: 'resolved',
+  priority: 'low',
+  description: 'Updated description'
+});
+```
+
+### Parameters
+
+<ParamField path="sequenceUid" type="string" required>
+  The unique identifier of the sequence
+</ParamField>
+
+<ParamField path="issueUid" type="string" required>
+  The unique identifier of the issue to update
+</ParamField>
+
+<ParamField path="options.status" type="string" optional>
+  New status for the issue
+</ParamField>
+
+<ParamField path="options.priority" type="string" optional>
+  New priority level
+</ParamField>
+
+<ParamField path="options.severity" type="string" optional>
+  New severity level
+</ParamField>
+
+<ParamField path="options.description" type="string" optional>
+  Updated description
+</ParamField>
+
+<ParamField path="options.toolUid" type="string" optional>
+  Updated tool UID
+</ParamField>
+
+<ParamField path="options.problemUid" type="string" optional>
+  Updated problem UID
+</ParamField>
+
+<ParamField path="options.wrongClass" type="string" optional>
+  Updated wrong class
+</ParamField>
+
+<ParamField path="options.framesAffected" type="string" optional>
+  Updated frame range
+</ParamField>
+
+### Returns
+
+Returns the updated annotation issue object.
+
+## Delete an annotation issue
+
+Delete an annotation issue.
+
+```typescript
+await avala.annotationIssues.delete('sequence-uid', 'issue-uid');
+```
+
+### Parameters
+
+<ParamField path="sequenceUid" type="string" required>
+  The unique identifier of the sequence
+</ParamField>
+
+<ParamField path="issueUid" type="string" required>
+  The unique identifier of the issue to delete
+</ParamField>
+
+### Returns
+
+Returns void on success.
+
+## List issues by dataset
+
+Retrieve all annotation issues for a dataset.
+
+```typescript
+const issues = await avala.annotationIssues.listByDataset('owner', 'dataset-slug', {
+  sequenceUid: 'sequence-uid'
+});
+```
+
+### Parameters
+
+<ParamField path="owner" type="string" required>
+  The owner of the dataset (username or organization slug)
+</ParamField>
+
+<ParamField path="datasetSlug" type="string" required>
+  The slug of the dataset
+</ParamField>
+
+<ParamField path="options.sequenceUid" type="string" optional>
+  Filter by specific sequence UID
+</ParamField>
+
+### Returns
+
+Returns an array of annotation issue objects.
+
+## Get issue metrics
+
+Retrieve metrics and statistics about annotation issues in a dataset.
+
+```typescript
+const metrics = await avala.annotationIssues.getMetrics('owner', 'dataset-slug', {
+  sequenceUid: 'sequence-uid'
+});
+```
+
+### Parameters
+
+<ParamField path="owner" type="string" required>
+  The owner of the dataset (username or organization slug)
+</ParamField>
+
+<ParamField path="datasetSlug" type="string" required>
+  The slug of the dataset
+</ParamField>
+
+<ParamField path="options.sequenceUid" type="string" optional>
+  Filter metrics by specific sequence UID
+</ParamField>
+
+### Returns
+
+<ResponseField name="statusCount" type="object | null">
+  Count of issues by status
+</ResponseField>
+
+<ResponseField name="priorityCount" type="object | null">
+  Count of issues by priority
+</ResponseField>
+
+<ResponseField name="severityCount" type="object | null">
+  Count of issues by severity
+</ResponseField>
+
+<ResponseField name="meanSecondsCloseTimeAll" type="number | null">
+  Average time to close all issues in seconds
+</ResponseField>
+
+<ResponseField name="meanSecondsCloseTimeCustomer" type="number | null">
+  Average time to close customer-reported issues in seconds
+</ResponseField>
+
+<ResponseField name="meanUnresolvedIssueAgeAll" type="number | null">
+  Average age of unresolved issues in seconds
+</ResponseField>
+
+<ResponseField name="meanUnresolvedIssueAgeCustomer" type="number | null">
+  Average age of unresolved customer-reported issues in seconds
+</ResponseField>
+
+<ResponseField name="objectCountByAnnotationIssueProblemUid" type="object[] | null">
+  Count of objects by problem type
+</ResponseField>
+
+## List available tools
+
+Retrieve available annotation tools for creating issues.
+
+```typescript
+const tools = await avala.annotationIssues.listTools({
+  datasetType: 'image'
+});
+```
+
+### Parameters
+
+<ParamField path="options.datasetType" type="string" required>
+  Type of dataset (e.g., 'image', 'video', 'lidar')
+</ParamField>
+
+### Returns
+
+Returns an array of annotation issue tool details.
+
+<ResponseField name="[].uid" type="string">
+  Unique identifier for the tool
+</ResponseField>
+
+<ResponseField name="[].name" type="string">
+  Name of the tool
+</ResponseField>
+
+<ResponseField name="[].datasetType" type="string | null">
+  Dataset type the tool is for
+</ResponseField>
+
+<ResponseField name="[].default" type="boolean | null">
+  Whether this is a default tool
+</ResponseField>
+
+<ResponseField name="[].problems" type="object[] | null">
+  Array of available problem types for this tool
+</ResponseField>

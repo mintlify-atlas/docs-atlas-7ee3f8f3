@@ -1,0 +1,248 @@
+---
+title: Datasets
+description: Manage and organize your data with datasets, items, and sequences
+---
+
+Datasets are the fundamental building blocks for organizing and managing your data in Avala. They can contain individual items or sequences of related data points.
+
+## Overview
+
+A dataset is a collection of labeled or unlabeled data that can be used for training, validation, or testing. Each dataset has:
+
+- A unique identifier (`uid`)
+- A human-readable name and URL-friendly slug
+- A data type (e.g., image, video, point cloud)
+- Optional sequence support for time-series or multi-frame data
+- Visibility controls (public/private)
+
+## Creating a dataset
+
+Create a new dataset with required metadata:
+
+```typescript
+const dataset = await avala.datasets.create({
+  name: 'My Training Dataset',
+  slug: 'my-training-dataset',
+  dataType: 'image',
+  isSequence: false,
+  visibility: 'private',
+  createMetadata: true
+});
+```
+
+### Options
+
+<ParamField path="name" type="string" required>
+  Human-readable name for the dataset
+</ParamField>
+
+<ParamField path="slug" type="string" required>
+  URL-friendly identifier for the dataset
+</ParamField>
+
+<ParamField path="dataType" type="string" required>
+  Type of data (e.g., 'image', 'video', 'pointcloud')
+</ParamField>
+
+<ParamField path="isSequence" type="boolean">
+  Whether this dataset contains sequences
+</ParamField>
+
+<ParamField path="visibility" type="string">
+  Dataset visibility: 'public' or 'private'
+</ParamField>
+
+<ParamField path="createMetadata" type="boolean">
+  Automatically create metadata storage
+</ParamField>
+
+<ParamField path="providerConfig" type="Record<string, unknown>">
+  Storage provider configuration
+</ParamField>
+
+<ParamField path="ownerName" type="string">
+  Owner username or organization slug
+</ParamField>
+
+## Listing datasets
+
+Retrieve datasets with optional filters:
+
+```typescript
+const page = await avala.datasets.list({
+  dataType: 'image',
+  status: 'active',
+  limit: 20
+});
+
+console.log(page.items);
+if (page.hasMore) {
+  const nextPage = await avala.datasets.list({ cursor: page.nextCursor });
+}
+```
+
+<Note>
+  Results are paginated using cursor-based pagination. Use the `nextCursor` field to fetch subsequent pages.
+</Note>
+
+### Filter options
+
+- `dataType` - Filter by data type
+- `name` - Filter by dataset name
+- `status` - Filter by status
+- `visibility` - Filter by visibility level
+- `limit` - Number of results per page (default: 20)
+- `cursor` - Pagination cursor
+
+## Getting a dataset
+
+Retrieve a single dataset by its UID:
+
+```typescript
+const dataset = await avala.datasets.get('dataset_uid_here');
+
+console.log(dataset.name);
+console.log(dataset.itemCount);
+```
+
+## Working with dataset items
+
+Dataset items represent individual data points within a dataset.
+
+<Steps>
+  <Step title="List items">
+    Retrieve items from a dataset using the owner and slug:
+
+    ```typescript
+    const items = await avala.datasets.listItems(
+      'owner-name',
+      'dataset-slug',
+      { limit: 50 }
+    );
+
+    for (const item of items.items) {
+      console.log(item.key, item.url);
+    }
+    ```
+  </Step>
+
+  <Step title="Get a specific item">
+    Retrieve detailed information about a single item:
+
+    ```typescript
+    const item = await avala.datasets.getItem(
+      'owner-name',
+      'dataset-slug',
+      'item_uid'
+    );
+
+    console.log(item.metadata);
+    console.log(item.annotations);
+    ```
+  </Step>
+</Steps>
+
+### Item properties
+
+Each `DatasetItem` includes:
+
+- `uid` - Unique identifier
+- `key` - Item key within the dataset
+- `url` - Primary data URL
+- `thumbnails` - Preview image URLs
+- `metadata` - Custom metadata object
+- `annotations` - Annotation data
+- `exportSnippet` - Export format data
+- `createdAt` / `updatedAt` - Timestamps
+
+## Working with sequences
+
+Sequences are collections of ordered frames, useful for video or time-series data.
+
+<Tabs>
+  <Tab title="List sequences">
+    ```typescript
+    const sequences = await avala.datasets.listSequences(
+      'owner-name',
+      'dataset-slug',
+      { limit: 10 }
+    );
+
+    for (const seq of sequences.items) {
+      console.log(`Sequence ${seq.key}: ${seq.numberOfFrames} frames`);
+    }
+    ```
+  </Tab>
+
+  <Tab title="Get sequence details">
+    ```typescript
+    const sequence = await avala.datasets.getSequence(
+      'owner-name',
+      'dataset-slug',
+      'sequence_uid'
+    );
+
+    console.log(sequence.views);
+    console.log(sequence.frames);
+    console.log(sequence.metrics);
+    ```
+  </Tab>
+</Tabs>
+
+### Sequence properties
+
+Each `DatasetSequence` includes:
+
+- `uid` - Unique identifier
+- `key` - Sequence key
+- `numberOfFrames` - Frame count
+- `views` - Camera or sensor views
+- `frames` - Frame data array
+- `metrics` - Computed metrics
+- `cropData` - Cropping information
+- `predefinedLabels` - Label configuration
+- `allowLidarCalibration` - LiDAR calibration support
+
+<Tip>
+  Use sequences for multi-frame data like videos, point cloud streams, or sensor fusion datasets.
+</Tip>
+
+## Response types
+
+All dataset operations use these TypeScript interfaces:
+
+```typescript
+interface Dataset {
+  uid: string;
+  name: string;
+  slug: string;
+  itemCount: number;
+  dataType: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+interface CursorPage<T> {
+  items: T[];
+  nextCursor: string | null;
+  previousCursor: string | null;
+  hasMore: boolean;
+}
+```
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Use descriptive slugs" icon="tag">
+    Choose URL-friendly slugs that clearly identify your dataset's purpose
+  </Card>
+  <Card title="Set visibility appropriately" icon="eye">
+    Use 'private' for sensitive data and 'public' for shared datasets
+  </Card>
+  <Card title="Leverage metadata" icon="database">
+    Store custom metadata with items for filtering and organization
+  </Card>
+  <Card title="Paginate results" icon="arrows-rotate">
+    Always handle pagination when listing items or sequences
+  </Card>
+</CardGroup>

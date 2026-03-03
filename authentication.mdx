@@ -1,0 +1,238 @@
+---
+title: Authentication
+description: Set up API key authentication for the Avala TypeScript SDK
+---
+
+## Overview
+
+The Avala API uses API keys to authenticate requests. All API requests must include a valid API key, which you can obtain from the [Avala dashboard](https://app.avala.ai/settings/api-keys).
+
+<Warning>
+  Keep your API keys secure and never commit them to version control. Use environment variables or secret management tools.
+</Warning>
+
+## Get your API key
+
+<Steps>
+  <Step title="Sign in to Avala">
+    Navigate to [app.avala.ai](https://app.avala.ai) and sign in to your account.
+  </Step>
+  <Step title="Open API settings">
+    Go to **Settings → API Keys** or visit [app.avala.ai/settings/api-keys](https://app.avala.ai/settings/api-keys).
+  </Step>
+  <Step title="Create a new key">
+    Click **Create API Key**, give it a descriptive name, and copy the generated key.
+  </Step>
+  <Step title="Store securely">
+    Save the key in a secure location. You won't be able to see it again after closing the dialog.
+  </Step>
+</Steps>
+
+<Note>
+  API keys are prefixed with `avk_` to help identify them.
+</Note>
+
+## Authentication methods
+
+The SDK supports two ways to provide your API key:
+
+### Environment variable (recommended)
+
+Set the `AVALA_API_KEY` environment variable, and the SDK will automatically use it:
+
+<CodeGroup>
+
+```bash macOS/Linux
+export AVALA_API_KEY="avk_your_api_key"
+```
+
+```bash Windows (PowerShell)
+$env:AVALA_API_KEY="avk_your_api_key"
+```
+
+```bash Windows (CMD)
+set AVALA_API_KEY=avk_your_api_key
+```
+
+</CodeGroup>
+
+Then initialize the client without any arguments:
+
+```typescript
+import Avala from "@avala-ai/sdk";
+
+const avala = new Avala();
+```
+
+<Tip>
+  This is the recommended approach for production applications. It keeps secrets out of your code and makes it easy to use different keys for different environments.
+</Tip>
+
+### Direct configuration
+
+Alternatively, pass the API key directly when creating the client:
+
+```typescript
+import Avala from "@avala-ai/sdk";
+
+const avala = new Avala({ 
+  apiKey: "avk_your_api_key" 
+});
+```
+
+<Warning>
+  Avoid hardcoding API keys in your source code. Use this method only for testing or when loading keys from a secure secret manager.
+</Warning>
+
+## Environment-specific keys
+
+Use different API keys for different environments (development, staging, production):
+
+```bash .env.development
+AVALA_API_KEY=avk_dev_key_here
+```
+
+```bash .env.production
+AVALA_API_KEY=avk_prod_key_here
+```
+
+Load the appropriate `.env` file using a package like [dotenv](https://www.npmjs.com/package/dotenv):
+
+```typescript
+import "dotenv/config";
+import Avala from "@avala-ai/sdk";
+
+const avala = new Avala();
+```
+
+<Tip>
+  Add `.env*` files to your `.gitignore` to prevent accidentally committing secrets.
+</Tip>
+
+## Authentication errors
+
+If your API key is invalid or missing, the SDK will throw an error:
+
+<CodeGroup>
+
+```typescript Missing API key
+import Avala from "@avala-ai/sdk";
+
+try {
+  const avala = new Avala();
+} catch (error) {
+  console.error(error.message);
+  // "No API key provided. Pass apiKey in config or set 
+  // the AVALA_API_KEY environment variable."
+}
+```
+
+```typescript Invalid API key
+import Avala, { AuthenticationError } from "@avala-ai/sdk";
+
+const avala = new Avala({ apiKey: "invalid_key" });
+
+try {
+  await avala.datasets.list();
+} catch (error) {
+  if (error instanceof AuthenticationError) {
+    console.error("Authentication failed:", error.message);
+    console.error("Status code:", error.statusCode); // 401
+  }
+}
+```
+
+</CodeGroup>
+
+## Additional configuration
+
+The SDK constructor accepts additional configuration options:
+
+```typescript
+import Avala from "@avala-ai/sdk";
+
+const avala = new Avala({
+  apiKey: "avk_your_api_key",
+  baseUrl: "https://api.avala.ai/api/v1", // Custom base URL
+  timeout: 60_000, // Request timeout in milliseconds (default: 30000)
+});
+```
+
+### Base URL configuration
+
+<Note>
+  You typically don't need to change the base URL unless you're working with a self-hosted Avala instance or a custom environment.
+</Note>
+
+For local development, you may need to use an HTTP base URL:
+
+```bash
+export AVALA_ALLOW_INSECURE_BASE_URL=true
+```
+
+```typescript
+const avala = new Avala({
+  apiKey: "avk_your_api_key",
+  baseUrl: "http://localhost:8000/api/v1"
+});
+```
+
+<Warning>
+  The SDK enforces HTTPS by default for security. Non-HTTPS URLs are only allowed for localhost when `AVALA_ALLOW_INSECURE_BASE_URL=true` is set.
+</Warning>
+
+### Request timeout
+
+Adjust the timeout for long-running requests:
+
+```typescript
+const avala = new Avala({
+  timeout: 60_000, // 60 seconds
+});
+```
+
+<Tip>
+  The default timeout is 30 seconds. Increase it if you're working with large exports or complex queries.
+</Tip>
+
+## Security best practices
+
+<AccordionGroup>
+  <Accordion title="Use environment variables">
+    Store API keys in environment variables or secret management tools, never in source code.
+  </Accordion>
+  <Accordion title="Rotate keys regularly">
+    Periodically rotate your API keys, especially if you suspect they may have been compromised.
+  </Accordion>
+  <Accordion title="Use different keys per environment">
+    Create separate API keys for development, staging, and production environments.
+  </Accordion>
+  <Accordion title="Restrict key permissions">
+    If your Avala plan supports it, create keys with limited scopes for specific use cases.
+  </Accordion>
+  <Accordion title="Monitor key usage">
+    Track API key usage in the Avala dashboard to detect unusual activity.
+  </Accordion>
+  <Accordion title="Revoke compromised keys immediately">
+    If an API key is exposed, revoke it immediately from the dashboard and create a new one.
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Quick start guide"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Make your first API call with the Avala SDK
+  </Card>
+  <Card
+    title="API reference"
+    icon="book"
+    href="/api-reference/overview"
+  >
+    Explore all available resources and methods
+  </Card>
+</CardGroup>

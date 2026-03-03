@@ -1,0 +1,304 @@
+---
+title: Tasks
+description: Track and manage annotation tasks within your projects
+---
+
+Tasks represent individual annotation or labeling jobs within Avala projects. They track work assignments, progress, and completion status.
+
+## Overview
+
+A task is a unit of work assigned within a project. Tasks enable you to:
+
+- Assign specific annotation jobs to team members
+- Track progress and status of labeling work
+- Organize work by task type and project
+- Monitor completion and quality
+
+## Task structure
+
+```typescript
+interface Task {
+  uid: string;
+  type: string | null;
+  name: string | null;
+  status: string | null;
+  project: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+```
+
+### Properties
+
+<ParamField path="uid" type="string">
+  Unique identifier for the task
+</ParamField>
+
+<ParamField path="type" type="string">
+  Task type (e.g., 'annotation', 'review', 'qa')
+</ParamField>
+
+<ParamField path="name" type="string">
+  Human-readable task name
+</ParamField>
+
+<ParamField path="status" type="string">
+  Current task status (e.g., 'pending', 'in_progress', 'completed')
+</ParamField>
+
+<ParamField path="project" type="string">
+  UID of the parent project
+</ParamField>
+
+<ParamField path="createdAt" type="string">
+  ISO 8601 timestamp of task creation
+</ParamField>
+
+<ParamField path="updatedAt" type="string">
+  ISO 8601 timestamp of last update
+</ParamField>
+
+## Listing tasks
+
+Retrieve tasks with optional filters:
+
+```typescript
+const page = await avala.tasks.list({
+  project: 'proj_123',
+  status: 'completed',
+  limit: 50
+});
+
+for (const task of page.items) {
+  console.log(`${task.name}: ${task.status}`);
+}
+```
+
+### Filter options
+
+<AccordionGroup>
+  <Accordion title="Filter by project">
+    Return only tasks belonging to a specific project:
+
+    ```typescript
+    const tasks = await avala.tasks.list({
+      project: 'proj_abc123'
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Filter by status">
+    Return only tasks with a specific status:
+
+    ```typescript
+    const tasks = await avala.tasks.list({
+      status: 'in_progress'
+    });
+    ```
+  </Accordion>
+
+  <Accordion title="Combine filters">
+    Use multiple filters together:
+
+    ```typescript
+    const tasks = await avala.tasks.list({
+      project: 'proj_abc123',
+      status: 'completed',
+      limit: 100
+    });
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Pagination
+
+Tasks use cursor-based pagination:
+
+```typescript
+let allTasks = [];
+let cursor: string | null = null;
+
+do {
+  const page = await avala.tasks.list({
+    limit: 100,
+    cursor: cursor || undefined
+  });
+  
+  allTasks.push(...page.items);
+  cursor = page.nextCursor;
+} while (cursor);
+
+console.log(`Total tasks: ${allTasks.length}`);
+```
+
+<Note>
+  Always check `hasMore` to determine if additional pages exist.
+</Note>
+
+## Getting a task
+
+Retrieve detailed information about a specific task:
+
+```typescript
+const task = await avala.tasks.get('task_uid_here');
+
+console.log(`Task: ${task.name}`);
+console.log(`Type: ${task.type}`);
+console.log(`Status: ${task.status}`);
+console.log(`Project: ${task.project}`);
+```
+
+## Task lifecycle
+
+Tasks progress through various status values:
+
+<Steps>
+  <Step title="Pending">
+    Task is created but not yet started
+  </Step>
+  
+  <Step title="In progress">
+    Task is actively being worked on
+  </Step>
+  
+  <Step title="Review">
+    Task work is complete and awaiting review
+  </Step>
+  
+  <Step title="Completed">
+    Task has been finished and approved
+  </Step>
+  
+  <Step title="Rejected">
+    Task was rejected and needs rework
+  </Step>
+</Steps>
+
+## Common workflows
+
+<Tabs>
+  <Tab title="Monitor project tasks">
+    ```typescript
+    // Get all tasks for a project
+    const tasks = await avala.tasks.list({
+      project: 'proj_123'
+    });
+    
+    // Count by status
+    const statusCounts = tasks.items.reduce((acc, task) => {
+      acc[task.status || 'unknown'] = (acc[task.status || 'unknown'] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    console.log(statusCounts);
+    // { pending: 5, in_progress: 3, completed: 12 }
+    ```
+  </Tab>
+
+  <Tab title="Find incomplete tasks">
+    ```typescript
+    // Get pending tasks
+    const pending = await avala.tasks.list({
+      status: 'pending'
+    });
+    
+    // Get in-progress tasks
+    const inProgress = await avala.tasks.list({
+      status: 'in_progress'
+    });
+    
+    const incomplete = pending.items.length + inProgress.items.length;
+    console.log(`${incomplete} tasks remaining`);
+    ```
+  </Tab>
+
+  <Tab title="Track task completion">
+    ```typescript
+    const task = await avala.tasks.get('task_123');
+    
+    if (task.status === 'completed') {
+      console.log(`Task completed on ${task.updatedAt}`);
+      
+      const createdDate = new Date(task.createdAt!);
+      const completedDate = new Date(task.updatedAt!);
+      const duration = completedDate.getTime() - createdDate.getTime();
+      
+      console.log(`Duration: ${duration / 1000 / 60 / 60} hours`);
+    }
+    ```
+  </Tab>
+
+  <Tab title="List all task types">
+    ```typescript
+    const tasks = await avala.tasks.list();
+    
+    const types = new Set(
+      tasks.items.map(t => t.type).filter(Boolean)
+    );
+    
+    console.log('Task types:', Array.from(types));
+    ```
+  </Tab>
+</Tabs>
+
+## Integration with agents
+
+Tasks can be automated using AI agents:
+
+```typescript
+// Agents can target specific task types
+interface Agent {
+  uid: string;
+  name: string;
+  taskTypes: string[];
+  project: string | null;
+  // ...
+}
+```
+
+<Info>
+  Configure agents to automatically process tasks of specific types within your projects.
+</Info>
+
+## Response format
+
+List operations return paginated results:
+
+```typescript
+interface CursorPage<Task> {
+  items: Task[];
+  nextCursor: string | null;
+  previousCursor: string | null;
+  hasMore: boolean;
+}
+```
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Filter by project" icon="filter">
+    Always filter tasks by project UID for better organization and performance
+  </Card>
+  
+  <Card title="Monitor status" icon="chart-line">
+    Track task status to measure progress and identify bottlenecks
+  </Card>
+  
+  <Card title="Use pagination" icon="arrows-rotate">
+    Handle pagination properly when working with large task lists
+  </Card>
+  
+  <Card title="Track timestamps" icon="clock">
+    Use `createdAt` and `updatedAt` to measure task duration and performance
+  </Card>
+</CardGroup>
+
+<Tip>
+  Combine project and status filters to efficiently query specific subsets of tasks.
+</Tip>
+
+## Related resources
+
+- **Projects**: Tasks belong to projects - see [Projects](/concepts/projects)
+- **Agents**: Automate task processing with AI agents
+- **Quality Targets**: Set quality standards for task completion

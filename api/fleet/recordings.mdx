@@ -1,0 +1,172 @@
+---
+title: Fleet recordings
+description: Access and manage device recordings
+---
+
+The Fleet Recordings resource allows you to list, retrieve, update, and delete recordings from your fleet devices.
+
+## List recordings
+
+Retrieve a paginated list of fleet recordings.
+
+```typescript
+const recordings = await client.fleet.recordings.list(options?);
+```
+
+### Parameters
+
+<ParamField path="options" type="ListRecordingsOptions" optional>
+  Optional filtering and pagination parameters
+
+  <ParamField path="device" type="string" optional>
+    Filter recordings by device UID
+  </ParamField>
+
+  <ParamField path="status" type="string" optional>
+    Filter recordings by status
+  </ParamField>
+
+  <ParamField path="limit" type="number" optional>
+    Maximum number of recordings to return per page
+  </ParamField>
+
+  <ParamField path="cursor" type="string" optional>
+    Cursor for pagination
+  </ParamField>
+</ParamField>
+
+### Returns
+
+<ResponseField name="items" type="FleetRecording[]">
+  Array of fleet recordings
+
+  <ResponseField name="uid" type="string">
+    Unique identifier for the recording
+  </ResponseField>
+
+  <ResponseField name="device" type="string | null">
+    UID of the device that created this recording
+  </ResponseField>
+
+  <ResponseField name="status" type="string | null">
+    Recording status
+  </ResponseField>
+
+  <ResponseField name="durationSeconds" type="number | null">
+    Recording duration in seconds
+  </ResponseField>
+
+  <ResponseField name="sizeBytes" type="number | null">
+    Recording size in bytes
+  </ResponseField>
+
+  <ResponseField name="topicCount" type="number">
+    Number of topics in the recording
+  </ResponseField>
+
+  <ResponseField name="tags" type="string[]">
+    Recording tags
+  </ResponseField>
+
+  <ResponseField name="topics" type="Array<Record<string, unknown>> | null">
+    List of topics in the recording
+  </ResponseField>
+
+  <ResponseField name="startedAt" type="string | null">
+    Recording start timestamp
+  </ResponseField>
+
+  <ResponseField name="endedAt" type="string | null">
+    Recording end timestamp
+  </ResponseField>
+
+  <ResponseField name="createdAt" type="string | null">
+    Creation timestamp
+  </ResponseField>
+
+  <ResponseField name="updatedAt" type="string | null">
+    Last update timestamp
+  </ResponseField>
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether more results are available
+</ResponseField>
+
+## Get recording
+
+Retrieve a specific recording by UID.
+
+```typescript
+const recording = await client.fleet.recordings.get(uid);
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the recording
+</ParamField>
+
+### Returns
+
+<ResponseField name="FleetRecording" type="object">
+  The requested recording
+</ResponseField>
+
+## Update recording
+
+Update an existing recording.
+
+```typescript
+const recording = await client.fleet.recordings.update(uid, options);
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the recording
+</ParamField>
+
+<ParamField path="options" type="UpdateRecordingOptions" required>
+  Fields to update
+
+  <ParamField path="status" type="string" optional>
+    Updated recording status
+  </ParamField>
+
+  <ParamField path="tags" type="string[]" optional>
+    Updated recording tags
+  </ParamField>
+</ParamField>
+
+### Returns
+
+<ResponseField name="FleetRecording" type="object">
+  The updated recording
+</ResponseField>
+
+## Delete recording
+
+Delete a recording from your fleet.
+
+```typescript
+await client.fleet.recordings.delete(uid);
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the recording to delete
+</ParamField>
+
+### Returns
+
+Returns `void` on success.

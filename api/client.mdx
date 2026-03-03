@@ -1,0 +1,184 @@
+---
+title: Avala client
+description: Main client class for the Avala TypeScript SDK
+---
+
+The `Avala` class is the main entry point for interacting with the Avala API. It provides access to all API resources and manages authentication and configuration.
+
+## Constructor
+
+```typescript
+import { Avala } from '@avala/sdk';
+
+const avala = new Avala(config?);
+```
+
+<ParamField path="config" type="AvalaConfig" optional>
+  Configuration options for the client. If not provided, the client will attempt to read the `AVALA_API_KEY` environment variable.
+
+  <Expandable title="properties">
+    <ParamField path="apiKey" type="string" optional>
+      Your Avala API key. If not provided, the client will read from the `AVALA_API_KEY` environment variable.
+    </ParamField>
+
+    <ParamField path="baseUrl" type="string" optional default="https://api.avala.ai/api/v1">
+      The base URL for the Avala API. Must use HTTPS unless `AVALA_ALLOW_INSECURE_BASE_URL` is set to `true` for local development.
+    </ParamField>
+
+    <ParamField path="timeout" type="number" optional default={30000}>
+      Request timeout in milliseconds.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+### Example
+
+```typescript
+import { Avala } from '@avala/sdk';
+
+// Using explicit API key
+const avala = new Avala({
+  apiKey: 'your-api-key',
+  timeout: 60000 // 60 seconds
+});
+
+// Using environment variable
+const avala = new Avala();
+```
+
+## Properties
+
+The `Avala` client provides access to the following resource groups:
+
+<ResponseField name="datasets" type="DatasetsResource">
+  Manage datasets and dataset items. See [Datasets API](/api/datasets).
+</ResponseField>
+
+<ResponseField name="projects" type="ProjectsResource">
+  Manage annotation projects. See [Projects API](/api/projects).
+</ResponseField>
+
+<ResponseField name="exports" type="ExportsResource">
+  Create and manage data exports. See [Exports API](/api/exports).
+</ResponseField>
+
+<ResponseField name="tasks" type="TasksResource">
+  Manage annotation tasks. See [Tasks API](/api/tasks).
+</ResponseField>
+
+<ResponseField name="storageConfigs" type="StorageConfigsResource">
+  Configure cloud storage integrations. See [Storage Configs API](/api/storage-configs).
+</ResponseField>
+
+<ResponseField name="agents" type="AgentsResource">
+  Manage AI agents and agent executions. See [Agents API](/api/agents).
+</ResponseField>
+
+<ResponseField name="annotationIssues" type="AnnotationIssuesResource">
+  Track and manage annotation quality issues. See [Annotation Issues API](/api/annotation-issues).
+</ResponseField>
+
+<ResponseField name="inferenceProviders" type="InferenceProvidersResource">
+  Configure inference providers for auto-labeling. See [Inference Providers API](/api/inference-providers).
+</ResponseField>
+
+<ResponseField name="autoLabelJobs" type="AutoLabelJobsResource">
+  Create and monitor auto-labeling jobs. See [Auto Label Jobs API](/api/auto-label-jobs).
+</ResponseField>
+
+<ResponseField name="qualityTargets" type="QualityTargetsResource">
+  Set and monitor data quality targets. See [Quality Targets API](/api/quality-targets).
+</ResponseField>
+
+<ResponseField name="consensus" type="ConsensusResource">
+  Compute and analyze annotation consensus. See [Consensus API](/api/consensus).
+</ResponseField>
+
+<ResponseField name="webhooks" type="WebhooksResource">
+  Configure webhook subscriptions. See [Webhooks API](/api/webhooks).
+</ResponseField>
+
+<ResponseField name="webhookDeliveries" type="WebhookDeliveriesResource">
+  View webhook delivery history. See [Webhooks API](/api/webhooks).
+</ResponseField>
+
+<ResponseField name="organizations" type="OrganizationsResource">
+  Manage organizations, teams, and members. See [Organizations API](/api/organizations).
+</ResponseField>
+
+<ResponseField name="slices" type="SlicesResource">
+  Create and manage data slices. See [Slices API](/api/slices).
+</ResponseField>
+
+<ResponseField name="fleet" type="FleetResource">
+  Manage fleet devices, recordings, and events. See [Fleet API](/api/fleet/overview).
+</ResponseField>
+
+<ResponseField name="rateLimitInfo" type="RateLimitInfo">
+  Rate limit information from the last API request.
+
+  <Expandable title="properties">
+    <ResponseField name="limit" type="string | null">
+      Maximum number of requests allowed in the current window.
+    </ResponseField>
+
+    <ResponseField name="remaining" type="string | null">
+      Number of requests remaining in the current window.
+    </ResponseField>
+
+    <ResponseField name="reset" type="string | null">
+      Timestamp when the rate limit window resets.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Rate limiting
+
+The Avala API implements rate limiting to ensure fair usage. After each request, you can check the current rate limit status:
+
+```typescript
+const avala = new Avala();
+
+// Make a request
+await avala.datasets.list();
+
+// Check rate limit info
+const rateLimitInfo = avala.rateLimitInfo;
+console.log(`Remaining: ${rateLimitInfo.remaining}/${rateLimitInfo.limit}`);
+console.log(`Resets at: ${rateLimitInfo.reset}`);
+```
+
+When you exceed the rate limit, the SDK will throw a `RateLimitError` with details about when you can retry.
+
+## Error handling
+
+The SDK throws typed errors for different error conditions:
+
+```typescript
+import { 
+  Avala, 
+  AuthenticationError, 
+  NotFoundError, 
+  RateLimitError,
+  ValidationError,
+  ServerError 
+} from '@avala/sdk';
+
+const avala = new Avala();
+
+try {
+  await avala.datasets.get('dataset-id');
+} catch (error) {
+  if (error instanceof AuthenticationError) {
+    console.error('Invalid API key');
+  } else if (error instanceof NotFoundError) {
+    console.error('Dataset not found');
+  } else if (error instanceof RateLimitError) {
+    console.error(`Rate limited. Retry after ${error.retryAfter} seconds`);
+  } else if (error instanceof ValidationError) {
+    console.error('Invalid request parameters');
+  } else if (error instanceof ServerError) {
+    console.error('Server error occurred');
+  }
+}
+```

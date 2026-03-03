@@ -1,0 +1,272 @@
+---
+title: Error handling
+description: Handle errors gracefully with typed error classes and retry strategies
+---
+
+The Avala SDK provides comprehensive error handling with specific error types for different failure scenarios. All errors extend the base `AvalaError` class and include helpful context.
+
+## Error types
+
+The SDK throws specific error types based on the response status code:
+
+<CodeGroup>
+```typescript Base error
+import { AvalaError } from '@avala/sdk';
+
+try {
+  const dataset = await avala.datasets.get('dataset-uid');
+} catch (error) {
+  if (error instanceof AvalaError) {
+    console.error('Status:', error.statusCode);
+    console.error('Message:', error.message);
+    console.error('Body:', error.body);
+  }
+}
+```
+
+```typescript Authentication error
+import { AuthenticationError } from '@avala/sdk';
+
+try {
+  const datasets = await avala.datasets.list();
+} catch (error) {
+  if (error instanceof AuthenticationError) {
+    // Status code: 401
+    console.error('Invalid API key:', error.message);
+  }
+}
+```
+
+```typescript Not found error
+import { NotFoundError } from '@avala/sdk';
+
+try {
+  const project = await avala.projects.get('invalid-uid');
+} catch (error) {
+  if (error instanceof NotFoundError) {
+    // Status code: 404
+    console.error('Resource not found:', error.message);
+  }
+}
+```
+</CodeGroup>
+
+### All error classes
+
+The SDK includes these error types:
+
+| Error class | Status code | Description |
+|-------------|-------------|-------------|
+| `AvalaError` | Any | Base error class for all SDK errors |
+| `AuthenticationError` | 401 | Invalid or missing API key |
+| `NotFoundError` | 404 | Requested resource does not exist |
+| `RateLimitError` | 429 | Rate limit exceeded |
+| `ValidationError` | 400, 422 | Invalid request parameters |
+| `ServerError` | 5xx | Server-side error |
+
+## Handling validation errors
+
+Validation errors include detailed information about what went wrong:
+
+```typescript
+import { ValidationError } from '@avala/sdk';
+
+try {
+  const dataset = await avala.datasets.create({
+    name: '', // Invalid: empty name
+    slug: 'my-dataset'
+  });
+} catch (error) {
+  if (error instanceof ValidationError) {
+    console.error('Validation failed:', error.message);
+    console.error('Status:', error.statusCode); // 400 or 422
+    console.error('Details:', error.details);
+    console.error('Response:', error.body);
+  }
+}
+```
+
+<Note>
+Validation errors contain a `details` array with field-level error information when available.
+</Note>
+
+## Handling rate limits
+
+Rate limit errors include retry timing information:
+
+<Steps>
+<Step title="Catch rate limit errors">
+  Use the `RateLimitError` class to detect when you've exceeded rate limits:
+
+  ```typescript
+  import { RateLimitError } from '@avala/sdk';
+
+  try {
+    const datasets = await avala.datasets.list();
+  } catch (error) {
+    if (error instanceof RateLimitError) {
+      console.error('Rate limit exceeded');
+      console.error('Retry after:', error.retryAfter, 'seconds');
+    }
+  }
+  ```
+</Step>
+
+<Step title="Implement retry logic">
+  Use the `retryAfter` property to determine when to retry:
+
+  ```typescript
+  async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
+    try {
+      return await fn();
+    } catch (error) {
+      if (error instanceof RateLimitError && error.retryAfter) {
+        await new Promise(resolve => 
+          setTimeout(resolve, error.retryAfter * 1000)
+        );
+        return await fn();
+      }
+      throw error;
+    }
+  }
+
+  const datasets = await withRetry(() => avala.datasets.list());
+  ```
+</Step>
+
+<Step title="Check rate limit status">
+  Monitor your rate limit status proactively:
+
+  ```typescript
+  const datasets = await avala.datasets.list();
+  
+  const rateLimit = avala.rateLimitInfo;
+  console.log('Limit:', rateLimit.limit);
+  console.log('Remaining:', rateLimit.remaining);
+  console.log('Reset:', rateLimit.reset);
+  ```
+</Step>
+</Steps>
+
+<Warning>
+The `retryAfter` property may be `null` if the server doesn't provide a `Retry-After` header. Always check for null before using it.
+</Warning>
+
+## Error response body
+
+All errors include the raw response body for debugging:
+
+```typescript
+try {
+  const export = await avala.exports.create({
+    datasetUid: 'dataset-uid',
+    format: 'invalid-format'
+  });
+} catch (error) {
+  if (error instanceof AvalaError) {
+    // Access the raw API response
+    console.error('Raw response:', error.body);
+    
+    // The body may contain additional error details
+    // from the API that aren't in the message
+  }
+}
+```
+
+## Best practices
+
+<Steps>
+<Step title="Check specific error types first">
+  Always check for specific error types before the base `AvalaError`:
+
+  ```typescript
+  try {
+    const dataset = await avala.datasets.get('dataset-uid');
+  } catch (error) {
+    if (error instanceof RateLimitError) {
+      // Handle rate limiting
+    } else if (error instanceof AuthenticationError) {
+      // Handle authentication
+    } else if (error instanceof NotFoundError) {
+      // Handle not found
+    } else if (error instanceof ValidationError) {
+      // Handle validation errors
+    } else if (error instanceof AvalaError) {
+      // Handle other API errors
+    } else {
+      // Handle non-API errors
+      throw error;
+    }
+  }
+  ```
+</Step>
+
+<Step title="Log error context for debugging">
+  Include status codes and response bodies in logs:
+
+  ```typescript
+  try {
+    const result = await avala.projects.create({
+      name: 'My Project'
+    });
+  } catch (error) {
+    if (error instanceof AvalaError) {
+      console.error({
+        message: error.message,
+        statusCode: error.statusCode,
+        body: error.body,
+        stack: error.stack
+      });
+    }
+  }
+  ```
+</Step>
+
+<Step title="Provide user-friendly messages">
+  Don't expose raw error messages to end users:
+
+  ```typescript
+  async function createDataset(name: string) {
+    try {
+      return await avala.datasets.create({ name });
+    } catch (error) {
+      if (error instanceof AuthenticationError) {
+        throw new Error('Authentication failed. Please check your API key.');
+      } else if (error instanceof ValidationError) {
+        throw new Error(`Invalid dataset name: ${error.message}`);
+      } else {
+        throw new Error('Failed to create dataset. Please try again.');
+      }
+    }
+  }
+  ```
+</Step>
+</Steps>
+
+<Tip>
+Use TypeScript's `instanceof` checks to get full type safety when handling errors.
+</Tip>
+
+## Server errors
+
+Server errors (5xx status codes) are thrown as `ServerError`:
+
+```typescript
+import { ServerError } from '@avala/sdk';
+
+try {
+  const datasets = await avala.datasets.list();
+} catch (error) {
+  if (error instanceof ServerError) {
+    console.error('Server error:', error.statusCode);
+    console.error('Message:', error.message);
+    
+    // Implement exponential backoff retry
+    // for server errors
+  }
+}
+```
+
+<Note>
+For server errors, implement exponential backoff retry logic rather than immediately retrying.
+</Note>

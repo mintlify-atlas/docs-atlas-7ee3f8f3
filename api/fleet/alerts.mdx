@@ -1,0 +1,332 @@
+---
+title: Fleet alerts
+description: Monitor and respond to triggered alerts and configure alert channels
+---
+
+The Fleet Alerts resource allows you to view, acknowledge, and resolve alerts triggered by fleet monitoring rules. It also provides alert channel management for notifications.
+
+## List alerts
+
+Retrieve a paginated list of fleet alerts.
+
+```typescript
+const alerts = await client.fleet.alerts.list(options?);
+```
+
+### Parameters
+
+<ParamField path="options" type="ListAlertsOptions" optional>
+  Optional filtering and pagination parameters
+
+  <ParamField path="status" type="string" optional>
+    Filter alerts by status (e.g., 'open', 'acknowledged', 'resolved')
+  </ParamField>
+
+  <ParamField path="severity" type="string" optional>
+    Filter alerts by severity level
+  </ParamField>
+
+  <ParamField path="device" type="string" optional>
+    Filter alerts by device UID
+  </ParamField>
+
+  <ParamField path="rule" type="string" optional>
+    Filter alerts by rule UID
+  </ParamField>
+
+  <ParamField path="limit" type="number" optional>
+    Maximum number of alerts to return per page
+  </ParamField>
+
+  <ParamField path="cursor" type="string" optional>
+    Cursor for pagination
+  </ParamField>
+</ParamField>
+
+### Returns
+
+<ResponseField name="items" type="FleetAlert[]">
+  Array of fleet alerts
+
+  <ResponseField name="uid" type="string">
+    Unique identifier for the alert
+  </ResponseField>
+
+  <ResponseField name="rule" type="string | null">
+    UID of the rule that triggered this alert
+  </ResponseField>
+
+  <ResponseField name="device" type="string | null">
+    UID of the associated device
+  </ResponseField>
+
+  <ResponseField name="recording" type="string | null">
+    UID of the associated recording
+  </ResponseField>
+
+  <ResponseField name="severity" type="string | null">
+    Alert severity level
+  </ResponseField>
+
+  <ResponseField name="status" type="string | null">
+    Alert status (e.g., 'open', 'acknowledged', 'resolved')
+  </ResponseField>
+
+  <ResponseField name="message" type="string | null">
+    Alert message
+  </ResponseField>
+
+  <ResponseField name="triggeredAt" type="string | null">
+    Timestamp when the alert was triggered
+  </ResponseField>
+
+  <ResponseField name="acknowledgedAt" type="string | null">
+    Timestamp when the alert was acknowledged
+  </ResponseField>
+
+  <ResponseField name="acknowledgedBy" type="string | null">
+    User who acknowledged the alert
+  </ResponseField>
+
+  <ResponseField name="resolvedAt" type="string | null">
+    Timestamp when the alert was resolved
+  </ResponseField>
+
+  <ResponseField name="resolutionNote" type="string | null">
+    Note added when resolving the alert
+  </ResponseField>
+
+  <ResponseField name="createdAt" type="string | null">
+    Creation timestamp
+  </ResponseField>
+
+  <ResponseField name="updatedAt" type="string | null">
+    Last update timestamp
+  </ResponseField>
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether more results are available
+</ResponseField>
+
+## Get alert
+
+Retrieve a specific alert by UID.
+
+```typescript
+const alert = await client.fleet.alerts.get(uid);
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the alert
+</ParamField>
+
+### Returns
+
+<ResponseField name="FleetAlert" type="object">
+  The requested alert
+</ResponseField>
+
+## Acknowledge alert
+
+Acknowledge an alert to indicate it has been seen.
+
+```typescript
+const alert = await client.fleet.alerts.acknowledge(uid);
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the alert to acknowledge
+</ParamField>
+
+### Returns
+
+<ResponseField name="FleetAlert" type="object">
+  The updated alert with acknowledgment information
+</ResponseField>
+
+## Resolve alert
+
+Resolve an alert and optionally add a resolution note.
+
+```typescript
+const alert = await client.fleet.alerts.resolve(uid, options?);
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the alert to resolve
+</ParamField>
+
+<ParamField path="options" type="ResolveAlertOptions" optional>
+  Resolution details
+
+  <ParamField path="resolutionNote" type="string" optional>
+    Note describing how the alert was resolved
+  </ParamField>
+</ParamField>
+
+### Returns
+
+<ResponseField name="FleetAlert" type="object">
+  The updated alert with resolution information
+</ResponseField>
+
+## Alert channels
+
+Alert channels define how and where notifications are sent when alerts are triggered.
+
+### List alert channels
+
+Retrieve a paginated list of alert channels.
+
+```typescript
+const channels = await client.fleet.alertChannels.list(options?);
+```
+
+#### Parameters
+
+<ParamField path="options" type="object" optional>
+  Optional pagination parameters
+
+  <ParamField path="limit" type="number" optional>
+    Maximum number of channels to return per page
+  </ParamField>
+
+  <ParamField path="cursor" type="string" optional>
+    Cursor for pagination
+  </ParamField>
+</ParamField>
+
+#### Returns
+
+<ResponseField name="items" type="FleetAlertChannel[]">
+  Array of alert channels
+
+  <ResponseField name="uid" type="string">
+    Unique identifier for the alert channel
+  </ResponseField>
+
+  <ResponseField name="name" type="string">
+    Alert channel name
+  </ResponseField>
+
+  <ResponseField name="type" type="string | null">
+    Channel type (e.g., 'email', 'slack', 'webhook')
+  </ResponseField>
+
+  <ResponseField name="config" type="Record<string, unknown> | null">
+    Channel-specific configuration
+  </ResponseField>
+
+  <ResponseField name="createdAt" type="string | null">
+    Creation timestamp
+  </ResponseField>
+
+  <ResponseField name="updatedAt" type="string | null">
+    Last update timestamp
+  </ResponseField>
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether more results are available
+</ResponseField>
+
+### Create alert channel
+
+Create a new alert notification channel.
+
+```typescript
+const channel = await client.fleet.alertChannels.create(options);
+```
+
+#### Parameters
+
+<ParamField path="options" type="CreateAlertChannelOptions" required>
+  Alert channel creation details
+
+  <ParamField path="name" type="string" required>
+    Alert channel name
+  </ParamField>
+
+  <ParamField path="type" type="string" required>
+    Channel type (e.g., 'email', 'slack', 'webhook')
+  </ParamField>
+
+  <ParamField path="config" type="Record<string, unknown>" required>
+    Channel-specific configuration (varies by type)
+  </ParamField>
+</ParamField>
+
+#### Returns
+
+<ResponseField name="FleetAlertChannel" type="object">
+  The newly created alert channel
+</ResponseField>
+
+### Delete alert channel
+
+Delete an alert channel.
+
+```typescript
+await client.fleet.alertChannels.delete(uid);
+```
+
+#### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the alert channel to delete
+</ParamField>
+
+#### Returns
+
+Returns `void` on success.
+
+### Test alert channel
+
+Send a test notification to verify an alert channel is configured correctly.
+
+```typescript
+const result = await client.fleet.alertChannels.test(uid);
+```
+
+#### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the alert channel to test
+</ParamField>
+
+#### Returns
+
+<ResponseField name="detail" type="string">
+  Test result message
+</ResponseField>
+
+<ResponseField name="channel_uid" type="string">
+  UID of the tested channel
+</ResponseField>
+
+<ResponseField name="channel_type" type="string">
+  Type of the tested channel
+</ResponseField>

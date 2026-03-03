@@ -1,0 +1,248 @@
+---
+title: Inference providers
+description: Configure and manage inference providers for automated predictions
+---
+
+Inference providers enable you to connect external machine learning models and services to your Avala projects. Configure API endpoints, authentication, and test connectivity to ensure smooth integration.
+
+## List inference providers
+
+Retrieve a paginated list of inference providers.
+
+```typescript
+const providers = await avala.inferenceProviders.list({
+  limit: 50,
+  cursor: 'next-cursor'
+});
+```
+
+### Parameters
+
+<ParamField path="options.limit" type="number" optional>
+  Maximum number of providers to return per page
+</ParamField>
+
+<ParamField path="options.cursor" type="string" optional>
+  Cursor for pagination
+</ParamField>
+
+### Returns
+
+Returns a cursor-paginated list of inference provider objects.
+
+<ResponseField name="items" type="InferenceProvider[]">
+  Array of inference provider objects
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether more results are available
+</ResponseField>
+
+## Create an inference provider
+
+Create a new inference provider.
+
+```typescript
+const provider = await avala.inferenceProviders.create({
+  name: 'YOLOv8 Detection',
+  description: 'Object detection using YOLOv8',
+  providerType: 'http',
+  config: {
+    endpoint: 'https://api.example.com/predict',
+    apiKey: 'your-api-key',
+    timeout: 30000
+  },
+  project: 'project-uid'
+});
+```
+
+### Parameters
+
+<ParamField path="options.name" type="string" required>
+  Name of the inference provider
+</ParamField>
+
+<ParamField path="options.description" type="string" optional>
+  Description of the provider's purpose
+</ParamField>
+
+<ParamField path="options.providerType" type="string" required>
+  Type of provider (e.g., 'http', 'grpc', 'aws', 'gcp')
+</ParamField>
+
+<ParamField path="options.config" type="Record<string, unknown>" required>
+  Configuration object containing provider-specific settings like endpoint URL, API keys, etc.
+</ParamField>
+
+<ParamField path="options.project" type="string" optional>
+  Project UID to scope the provider to
+</ParamField>
+
+### Returns
+
+Returns the created inference provider object.
+
+<ResponseField name="uid" type="string">
+  Unique identifier for the provider
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Name of the provider
+</ResponseField>
+
+<ResponseField name="description" type="string | null">
+  Description of the provider
+</ResponseField>
+
+<ResponseField name="providerType" type="string | null">
+  Type of provider
+</ResponseField>
+
+<ResponseField name="config" type="object | null">
+  Configuration settings
+</ResponseField>
+
+<ResponseField name="isActive" type="boolean">
+  Whether the provider is active
+</ResponseField>
+
+<ResponseField name="project" type="string | null">
+  Project UID the provider is scoped to
+</ResponseField>
+
+<ResponseField name="lastTestAt" type="string | null">
+  ISO 8601 timestamp of last connectivity test
+</ResponseField>
+
+<ResponseField name="lastTestSuccess" type="boolean | null">
+  Whether the last test was successful
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null">
+  ISO 8601 timestamp of creation
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null">
+  ISO 8601 timestamp of last update
+</ResponseField>
+
+## Get an inference provider
+
+Retrieve a specific inference provider by UID.
+
+```typescript
+const provider = await avala.inferenceProviders.get('provider-uid');
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the inference provider
+</ParamField>
+
+### Returns
+
+Returns the inference provider object.
+
+## Update an inference provider
+
+Update an existing inference provider.
+
+```typescript
+const provider = await avala.inferenceProviders.update('provider-uid', {
+  name: 'Updated Provider Name',
+  isActive: false,
+  config: {
+    endpoint: 'https://api.example.com/v2/predict',
+    apiKey: 'new-api-key'
+  }
+});
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the provider to update
+</ParamField>
+
+<ParamField path="options.name" type="string" optional>
+  New name for the provider
+</ParamField>
+
+<ParamField path="options.description" type="string" optional>
+  New description
+</ParamField>
+
+<ParamField path="options.providerType" type="string" optional>
+  New provider type
+</ParamField>
+
+<ParamField path="options.config" type="Record<string, unknown>" optional>
+  Updated configuration settings
+</ParamField>
+
+<ParamField path="options.isActive" type="boolean" optional>
+  Whether the provider should be active
+</ParamField>
+
+<ParamField path="options.project" type="string" optional>
+  New project UID to scope the provider to
+</ParamField>
+
+### Returns
+
+Returns the updated inference provider object.
+
+## Delete an inference provider
+
+Delete an inference provider.
+
+```typescript
+await avala.inferenceProviders.delete('provider-uid');
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the provider to delete
+</ParamField>
+
+### Returns
+
+Returns void on success.
+
+## Test an inference provider
+
+Test connectivity and configuration of an inference provider.
+
+```typescript
+const result = await avala.inferenceProviders.test('provider-uid');
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the provider to test
+</ParamField>
+
+### Returns
+
+<ResponseField name="success" type="boolean">
+  Whether the test was successful
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Description of the test result
+</ResponseField>
+
+<ResponseField name="testedAt" type="string">
+  ISO 8601 timestamp of when the test was performed
+</ResponseField>

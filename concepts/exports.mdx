@@ -1,0 +1,339 @@
+---
+title: Exports
+description: Export annotation data and results from projects and datasets
+---
+
+Exports enable you to download annotated data, labels, and results from Avala in various formats for use in training pipelines and external tools.
+
+## Overview
+
+The Exports resource allows you to:
+
+- Export annotations from projects
+- Download dataset items and labels
+- Generate training-ready data
+- Access results in standard formats (COCO, YOLO, etc.)
+- Track export status and download URLs
+
+Each export is asynchronous and provides a download URL when ready.
+
+## Export structure
+
+```typescript
+interface Export {
+  uid: string;
+  status: string | null;
+  downloadUrl: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+```
+
+### Properties
+
+<ParamField path="uid" type="string">
+  Unique identifier for the export
+</ParamField>
+
+<ParamField path="status" type="string">
+  Current export status: 'pending', 'processing', 'completed', or 'failed'
+</ParamField>
+
+<ParamField path="downloadUrl" type="string">
+  URL to download the export file (available when status is 'completed')
+</ParamField>
+
+<ParamField path="createdAt" type="string">
+  ISO 8601 timestamp when export was requested
+</ParamField>
+
+<ParamField path="updatedAt" type="string">
+  ISO 8601 timestamp of last status update
+</ParamField>
+
+## Creating an export
+
+Request a new export from a project or dataset:
+
+<Tabs>
+  <Tab title="Export from project">
+    ```typescript
+    const exportJob = await avala.exports.create({
+      project: 'proj_abc123'
+    });
+    
+    console.log(`Export created: ${exportJob.uid}`);
+    console.log(`Status: ${exportJob.status}`);
+    ```
+  </Tab>
+
+  <Tab title="Export from dataset">
+    ```typescript
+    const exportJob = await avala.exports.create({
+      dataset: 'dataset_xyz789'
+    });
+    
+    console.log(`Export created: ${exportJob.uid}`);
+    ```
+  </Tab>
+</Tabs>
+
+### Create options
+
+<ParamField path="project" type="string">
+  Project UID to export annotations from
+</ParamField>
+
+<ParamField path="dataset" type="string">
+  Dataset UID to export items from
+</ParamField>
+
+<Note>
+  Provide either `project` or `dataset`, not both. The export will include all relevant data from the specified resource.
+</Note>
+
+## Listing exports
+
+Retrieve all exports with pagination:
+
+```typescript
+const page = await avala.exports.list({
+  limit: 20
+});
+
+for (const exp of page.items) {
+  console.log(`${exp.uid}: ${exp.status}`);
+  if (exp.downloadUrl) {
+    console.log(`  Download: ${exp.downloadUrl}`);
+  }
+}
+
+// Get next page
+if (page.hasMore) {
+  const nextPage = await avala.exports.list({
+    cursor: page.nextCursor
+  });
+}
+```
+
+### Pagination parameters
+
+<ParamField path="limit" type="number">
+  Maximum number of exports to return (default: 20)
+</ParamField>
+
+<ParamField path="cursor" type="string">
+  Cursor for fetching the next page of results
+</ParamField>
+
+## Getting an export
+
+Retrieve details about a specific export:
+
+```typescript
+const exportJob = await avala.exports.get('export_uid_here');
+
+console.log(`Status: ${exportJob.status}`);
+
+if (exportJob.status === 'completed') {
+  console.log(`Download: ${exportJob.downloadUrl}`);
+}
+```
+
+## Export lifecycle
+
+Exports progress through several status values:
+
+<Steps>
+  <Step title="Pending">
+    Export has been created and is queued for processing
+    
+    ```typescript
+    { status: 'pending', downloadUrl: null }
+    ```
+  </Step>
+
+  <Step title="Processing">
+    Export is actively being generated
+    
+    ```typescript
+    { status: 'processing', downloadUrl: null }
+    ```
+  </Step>
+
+  <Step title="Completed">
+    Export is ready for download
+    
+    ```typescript
+    {
+      status: 'completed',
+      downloadUrl: 'https://storage.avala.ai/exports/...'
+    }
+    ```
+  </Step>
+
+  <Step title="Failed">
+    Export encountered an error
+    
+    ```typescript
+    { status: 'failed', downloadUrl: null }
+    ```
+  </Step>
+</Steps>
+
+## Common workflows
+
+<Tabs>
+  <Tab title="Export and download">
+    ```typescript
+    // Create export
+    const exportJob = await avala.exports.create({
+      project: 'proj_123'
+    });
+    
+    // Poll for completion
+    let status = exportJob.status;
+    while (status === 'pending' || status === 'processing') {
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      
+      const updated = await avala.exports.get(exportJob.uid);
+      status = updated.status;
+      
+      if (status === 'completed') {
+        console.log(`Download ready: ${updated.downloadUrl}`);
+        break;
+      }
+      
+      if (status === 'failed') {
+        console.error('Export failed');
+        break;
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Check recent exports">
+    ```typescript
+    const recent = await avala.exports.list({ limit: 10 });
+    
+    const completed = recent.items.filter(
+      exp => exp.status === 'completed'
+    );
+    
+    console.log(`${completed.length} completed exports`);
+    
+    for (const exp of completed) {
+      console.log(exp.downloadUrl);
+    }
+    ```
+  </Tab>
+
+  <Tab title="Automated export">
+    ```typescript
+    async function exportAndDownload(projectUid: string) {
+      // Request export
+      const exportJob = await avala.exports.create({
+        project: projectUid
+      });
+      
+      // Wait for completion (with timeout)
+      const maxAttempts = 60; // 5 minutes
+      for (let i = 0; i < maxAttempts; i++) {
+        const current = await avala.exports.get(exportJob.uid);
+        
+        if (current.status === 'completed') {
+          return current.downloadUrl;
+        }
+        
+        if (current.status === 'failed') {
+          throw new Error('Export failed');
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+      
+      throw new Error('Export timeout');
+    }
+    
+    const url = await exportAndDownload('proj_123');
+    console.log(`Download: ${url}`);
+    ```
+  </Tab>
+
+  <Tab title="List all exports">
+    ```typescript
+    // Fetch all exports using pagination
+    const allExports = [];
+    let cursor: string | null = null;
+    
+    do {
+      const page = await avala.exports.list({
+        limit: 50,
+        cursor: cursor || undefined
+      });
+      
+      allExports.push(...page.items);
+      cursor = page.nextCursor;
+    } while (cursor);
+    
+    console.log(`Total exports: ${allExports.length}`);
+    ```
+  </Tab>
+</Tabs>
+
+## Response format
+
+List operations return paginated results:
+
+```typescript
+interface CursorPage<Export> {
+  items: Export[];
+  nextCursor: string | null;
+  previousCursor: string | null;
+  hasMore: boolean;
+}
+```
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Poll efficiently" icon="clock">
+    Wait 5-10 seconds between status checks to avoid rate limits
+  </Card>
+  
+  <Card title="Handle failures" icon="triangle-exclamation">
+    Always check for 'failed' status and implement error handling
+  </Card>
+  
+  <Card title="Set timeouts" icon="timer">
+    Implement reasonable timeouts when polling for export completion
+  </Card>
+  
+  <Card title="Cache download URLs" icon="link">
+    Store download URLs temporarily as they may expire after some time
+  </Card>
+</CardGroup>
+
+<Warning>
+  Download URLs are temporary and may expire. Download the export file promptly after it becomes available.
+</Warning>
+
+## Export formats
+
+Depending on your project configuration, exports may be available in formats like:
+
+- **COCO JSON** - Common Objects in Context format
+- **YOLO** - YOLO training format
+- **Pascal VOC** - Pascal VOC XML format
+- **CSV** - Tabular export of annotations
+- **JSON** - Raw annotation data
+
+<Tip>
+  Export formats are determined by your project settings and data type. Configure your project's export format in the Avala dashboard.
+</Tip>
+
+## Related resources
+
+- **Projects**: Export annotations from projects - see [Projects](/concepts/projects)
+- **Datasets**: Export dataset items - see [Datasets](/concepts/datasets)
+- **Storage Config**: Configure export storage destination

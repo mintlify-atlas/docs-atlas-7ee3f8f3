@@ -1,0 +1,216 @@
+---
+title: Storage configs
+description: Manage storage configurations for external storage providers
+---
+
+The `StorageConfigsResource` provides methods to create, list, test, and delete storage configurations for connecting to external storage providers like AWS S3 and Google Cloud Storage.
+
+## List storage configs
+
+Retrieve a paginated list of all storage configurations.
+
+```typescript
+const response = await avala.storageConfigs.list({
+  limit: 50
+});
+```
+
+### Parameters
+
+<ParamField path="limit" type="number">
+  Maximum number of results to return
+</ParamField>
+
+<ParamField path="cursor" type="string">
+  Cursor for pagination
+</ParamField>
+
+### Returns
+
+<ResponseField name="items" type="StorageConfig[]">
+  Array of storage configuration objects
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether there are more results available
+</ResponseField>
+
+## Create a storage config
+
+Create a new storage configuration for an external storage provider.
+
+```typescript
+// AWS S3 configuration
+const s3Config = await avala.storageConfigs.create({
+  name: "My S3 Bucket",
+  provider: "s3",
+  s3BucketName: "my-bucket",
+  s3BucketRegion: "us-east-1",
+  s3AccessKeyId: "AKIAIOSFODNN7EXAMPLE",
+  s3SecretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+});
+
+// Google Cloud Storage configuration
+const gcsConfig = await avala.storageConfigs.create({
+  name: "My GCS Bucket",
+  provider: "gcs",
+  gcStorageBucketName: "my-gcs-bucket",
+  gcStorageAuthJsonContent: JSON.stringify(serviceAccountJson)
+});
+```
+
+### Parameters
+
+<ParamField path="name" type="string" required>
+  The name of the storage configuration
+</ParamField>
+
+<ParamField path="provider" type="string" required>
+  The storage provider type (e.g., "s3", "gcs")
+</ParamField>
+
+<ParamField path="s3BucketName" type="string">
+  AWS S3 bucket name (required for S3 provider)
+</ParamField>
+
+<ParamField path="s3BucketRegion" type="string">
+  AWS S3 bucket region (e.g., "us-east-1")
+</ParamField>
+
+<ParamField path="s3BucketPrefix" type="string">
+  Optional prefix for S3 objects
+</ParamField>
+
+<ParamField path="s3AccessKeyId" type="string">
+  AWS access key ID for authentication
+</ParamField>
+
+<ParamField path="s3SecretAccessKey" type="string">
+  AWS secret access key for authentication
+</ParamField>
+
+<ParamField path="s3IsAccelerated" type="boolean">
+  Whether to use S3 transfer acceleration
+</ParamField>
+
+<ParamField path="gcStorageBucketName" type="string">
+  Google Cloud Storage bucket name (required for GCS provider)
+</ParamField>
+
+<ParamField path="gcStoragePrefix" type="string">
+  Optional prefix for GCS objects
+</ParamField>
+
+<ParamField path="gcStorageAuthJsonContent" type="string">
+  JSON content of the GCS service account credentials
+</ParamField>
+
+### Returns
+
+<ResponseField name="uid" type="string">
+  The unique identifier for the storage configuration
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The name of the storage configuration
+</ResponseField>
+
+<ResponseField name="provider" type="string">
+  The storage provider type
+</ResponseField>
+
+<ResponseField name="s3BucketName" type="string | null">
+  AWS S3 bucket name
+</ResponseField>
+
+<ResponseField name="s3BucketRegion" type="string | null">
+  AWS S3 bucket region
+</ResponseField>
+
+<ResponseField name="s3BucketPrefix" type="string | null">
+  S3 object prefix
+</ResponseField>
+
+<ResponseField name="s3IsAccelerated" type="boolean">
+  Whether S3 transfer acceleration is enabled
+</ResponseField>
+
+<ResponseField name="gcStorageBucketName" type="string | null">
+  Google Cloud Storage bucket name
+</ResponseField>
+
+<ResponseField name="gcStoragePrefix" type="string | null">
+  GCS object prefix
+</ResponseField>
+
+<ResponseField name="isVerified" type="boolean">
+  Whether the storage configuration has been verified
+</ResponseField>
+
+<ResponseField name="lastVerifiedAt" type="string | null">
+  The timestamp when the configuration was last verified
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null">
+  The timestamp when the configuration was created
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null">
+  The timestamp when the configuration was last updated
+</ResponseField>
+
+## Test a storage config
+
+Test a storage configuration to verify connectivity and permissions.
+
+```typescript
+const result = await avala.storageConfigs.test("config_uid");
+
+if (result.verified) {
+  console.log("Storage configuration is valid");
+} else {
+  console.error("Verification failed:", result.errors);
+}
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the storage configuration to test
+</ParamField>
+
+### Returns
+
+<ResponseField name="verified" type="boolean">
+  Whether the storage configuration passed verification
+</ResponseField>
+
+<ResponseField name="errors" type="Record<string, string[]>">
+  Validation errors if verification failed
+</ResponseField>
+
+## Delete a storage config
+
+Delete a storage configuration.
+
+```typescript
+await avala.storageConfigs.delete("config_uid");
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the storage configuration to delete
+</ParamField>
+
+### Returns
+
+Returns void on successful deletion.

@@ -1,122 +1,125 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Avala TypeScript SDK",
+  "theme": "palm",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#6366f1",
+    "light": "#818cf8",
+    "dark": "#4f46e5"
   },
-  "favicon": "/favicon.svg",
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/avala-ai/avala-sdk-ts"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/avala-ai/avala-sdk-ts"
+    }
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Get Started",
             "pages": [
-              "index",
+              "introduction",
+              "installation",
               "quickstart",
-              "development"
+              "authentication"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Core Concepts",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "concepts/datasets",
+              "concepts/projects",
+              "concepts/tasks",
+              "concepts/exports"
             ]
           },
           {
-            "group": "Writing content",
+            "group": "Guides",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
+              "guides/error-handling",
+              "guides/pagination",
+              "guides/rate-limits",
+              "guides/typescript"
             ]
           },
           {
-            "group": "AI tools",
+            "group": "MCP Server",
             "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "mcp/overview",
+              "mcp/installation",
+              "mcp/configuration",
+              "mcp/available-tools"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "API Reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Client",
             "pages": [
-              "api-reference/introduction"
+              "api/client",
+              "api/configuration"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Core Resources",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api/datasets",
+              "api/projects",
+              "api/tasks",
+              "api/exports",
+              "api/storage-configs"
+            ]
+          },
+          {
+            "group": "Quality & Automation",
+            "pages": [
+              "api/agents",
+              "api/annotation-issues",
+              "api/auto-label-jobs",
+              "api/quality-targets",
+              "api/consensus",
+              "api/inference-providers"
+            ]
+          },
+          {
+            "group": "Organization & Collaboration",
+            "pages": [
+              "api/organizations",
+              "api/slices",
+              "api/webhooks"
+            ]
+          },
+          {
+            "group": "Fleet Management",
+            "pages": [
+              "api/fleet/overview",
+              "api/fleet/devices",
+              "api/fleet/recordings",
+              "api/fleet/events",
+              "api/fleet/rules",
+              "api/fleet/alerts"
+            ]
+          },
+          {
+            "group": "Types & Errors",
+            "pages": [
+              "api/types",
+              "api/errors"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
+    ]
   }
 }

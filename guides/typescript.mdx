@@ -1,0 +1,524 @@
+---
+title: TypeScript usage
+description: Leverage full type safety with TypeScript interfaces and generics
+---
+
+The Avala SDK is written in TypeScript and provides comprehensive type definitions for all API resources, making it easy to build type-safe applications.
+
+## Type safety benefits
+
+The SDK provides full IntelliSense support and compile-time type checking:
+
+```typescript
+import { Avala, Dataset } from '@avala/sdk';
+
+const avala = new Avala({ apiKey: 'your-api-key' });
+
+// TypeScript knows the return type is Dataset
+const dataset: Dataset = await avala.datasets.get('dataset-uid');
+
+// IntelliSense suggests available properties
+console.log(dataset.name);
+console.log(dataset.itemCount);
+console.log(dataset.createdAt);
+```
+
+## Resource types
+
+All resource types are exported from the SDK:
+
+<CodeGroup>
+```typescript Datasets
+import type { Dataset } from '@avala/sdk';
+
+interface Dataset {
+  uid: string;
+  name: string;
+  slug: string;
+  itemCount: number;
+  dataType: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+const dataset: Dataset = await avala.datasets.get('dataset-uid');
+```
+
+```typescript Projects
+import type { Project } from '@avala/sdk';
+
+interface Project {
+  uid: string;
+  name: string;
+  status: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+const project: Project = await avala.projects.get('project-uid');
+```
+
+```typescript Tasks
+import type { Task } from '@avala/sdk';
+
+interface Task {
+  uid: string;
+  type: string | null;
+  name: string | null;
+  status: string | null;
+  project: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+const tasks: Task[] = await avala.tasks.list();
+```
+</CodeGroup>
+
+## Pagination types
+
+The SDK uses a generic `CursorPage<T>` type for paginated responses:
+
+```typescript
+import type { CursorPage, Dataset } from '@avala/sdk';
+
+// Type is automatically inferred
+const page = await avala.datasets.list();
+
+// Or explicitly typed
+const typedPage: CursorPage<Dataset> = await avala.datasets.list();
+
+// Access typed items
+for (const dataset of page.items) {
+  // TypeScript knows this is a Dataset
+  console.log(dataset.name);
+}
+```
+
+### CursorPage definition
+
+The pagination type is defined as:
+
+```typescript types.ts:65-70
+export interface CursorPage<T> {
+  items: T[];
+  nextCursor: string | null;
+  previousCursor: string | null;
+  hasMore: boolean;
+}
+```
+
+<Tip>
+Use the generic `CursorPage<T>` type when building pagination utilities.
+</Tip>
+
+## Configuration types
+
+The client configuration is fully typed:
+
+```typescript
+import { Avala, type AvalaConfig } from '@avala/sdk';
+
+const config: AvalaConfig = {
+  apiKey: 'your-api-key',
+  baseUrl: 'https://api.avala.ai/api/v1',
+  timeout: 30000
+};
+
+const avala = new Avala(config);
+```
+
+### AvalaConfig interface
+
+```typescript types.ts:1-5
+export interface AvalaConfig {
+  apiKey?: string;
+  baseUrl?: string;
+  timeout?: number;
+}
+```
+
+<Note>
+All configuration properties are optional. The SDK will use environment variables and defaults when not provided.
+</Note>
+
+## Error types
+
+All error classes are fully typed with specific properties:
+
+<CodeGroup>
+```typescript Base error
+import { AvalaError } from '@avala/sdk';
+
+try {
+  await avala.datasets.get('dataset-uid');
+} catch (error) {
+  if (error instanceof AvalaError) {
+    // TypeScript knows these properties exist
+    const status: number | undefined = error.statusCode;
+    const body: unknown = error.body;
+    const message: string = error.message;
+  }
+}
+```
+
+```typescript Rate limit error
+import { RateLimitError } from '@avala/sdk';
+
+try {
+  await avala.datasets.list();
+} catch (error) {
+  if (error instanceof RateLimitError) {
+    // RateLimitError has additional typed property
+    const retryAfter: number | null = error.retryAfter;
+    
+    if (retryAfter) {
+      console.log(`Retry after ${retryAfter} seconds`);
+    }
+  }
+}
+```
+
+```typescript Validation error
+import { ValidationError } from '@avala/sdk';
+
+try {
+  await avala.datasets.create({ name: '' });
+} catch (error) {
+  if (error instanceof ValidationError) {
+    // ValidationError includes details array
+    const details: unknown[] = error.details;
+    const statusCode: number = error.statusCode; // 400 or 422
+    
+    console.error('Validation errors:', details);
+  }
+}
+```
+</CodeGroup>
+
+## Generic request helpers
+
+Build type-safe wrappers using TypeScript generics:
+
+```typescript
+import type { Avala, CursorPage } from '@avala/sdk';
+
+async function fetchAll<T>(
+  fetcher: (cursor: string | null) => Promise<CursorPage<T>>
+): Promise<T[]> {
+  const items: T[] = [];
+  let cursor: string | null = null;
+  
+  do {
+    const page = await fetcher(cursor);
+    items.push(...page.items);
+    cursor = page.nextCursor;
+  } while (cursor !== null);
+  
+  return items;
+}
+
+// Usage with type inference
+const datasets = await fetchAll((cursor) => 
+  avala.datasets.list({ cursor })
+);
+
+// TypeScript knows datasets is Dataset[]
+console.log(datasets[0].name);
+```
+
+## Complex types
+
+The SDK includes types for complex nested structures:
+
+<CodeGroup>
+```typescript Agent
+import type { Agent } from '@avala/sdk';
+
+interface Agent {
+  uid: string;
+  name: string;
+  description: string | null;
+  events: string[];
+  callbackUrl: string | null;
+  isActive: boolean;
+  project: string | null;
+  taskTypes: string[];
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+const agent: Agent = await avala.agents.get('agent-uid');
+
+// Type-safe array access
+const firstEvent: string = agent.events[0];
+```
+
+```typescript Organization
+import type { Organization } from '@avala/sdk';
+
+interface Organization {
+  uid: string;
+  name: string;
+  slug: string;
+  handle: string | null;
+  description: string | null;
+  logo: string | null;
+  website: string | null;
+  industry: string | null;
+  email: string | null;
+  phone: string | null;
+  visibility: string | null;
+  plan: string | null;
+  isVerified: boolean;
+  isActive: boolean;
+  memberCount: number | null;
+  teamCount: number | null;
+  datasetCount: number | null;
+  projectCount: number | null;
+  sliceCount: number | null;
+  role: string | null;
+  joinedAt: string | null;
+  allowedDomains: string[] | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+const org: Organization = await avala.organizations.get('org-slug');
+```
+
+```typescript Webhook
+import type { Webhook, WebhookDelivery } from '@avala/sdk';
+
+interface Webhook {
+  uid: string;
+  targetUrl: string;
+  events: string[];
+  isActive: boolean;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+interface WebhookDelivery {
+  uid: string;
+  subscription: string;
+  eventType: string;
+  payload: Record<string, unknown>;
+  responseStatus: number | null;
+  responseBody: string | null;
+  attempts: number;
+  nextRetryAt: string | null;
+  status: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+const webhook: Webhook = await avala.webhooks.get('webhook-uid');
+const deliveries: CursorPage<WebhookDelivery> = 
+  await avala.webhookDeliveries.list({ webhookUid: webhook.uid });
+```
+</CodeGroup>
+
+## Type guards
+
+Create type-safe guards for runtime checks:
+
+```typescript
+import type { Dataset, Project } from '@avala/sdk';
+
+function isDataset(resource: Dataset | Project): resource is Dataset {
+  return 'itemCount' in resource;
+}
+
+function isProject(resource: Dataset | Project): resource is Project {
+  return 'status' in resource;
+}
+
+// Usage
+const resource: Dataset | Project = await getResource();
+
+if (isDataset(resource)) {
+  // TypeScript knows this is a Dataset
+  console.log('Items:', resource.itemCount);
+} else {
+  // TypeScript knows this is a Project
+  console.log('Status:', resource.status);
+}
+```
+
+## Null safety
+
+Many properties are nullable in the API response:
+
+```typescript
+import type { Dataset } from '@avala/sdk';
+
+const dataset: Dataset = await avala.datasets.get('dataset-uid');
+
+// Handle nullable properties safely
+const dataType: string = dataset.dataType ?? 'unknown';
+
+if (dataset.createdAt) {
+  const created = new Date(dataset.createdAt);
+  console.log('Created:', created.toLocaleDateString());
+}
+
+// Optional chaining for nested nullable properties
+const orgName = dataset.organization?.name ?? 'No organization';
+```
+
+<Warning>
+Always check for null values before using properties marked as `string | null` or `number | null`.
+</Warning>
+
+## Type-safe request builders
+
+Build composable, type-safe request utilities:
+
+```typescript
+import type { Avala, Dataset, Project } from '@avala/sdk';
+
+class TypeSafeClient {
+  constructor(private avala: Avala) {}
+  
+  async getResource<T extends Dataset | Project>(
+    type: 'dataset' | 'project',
+    uid: string
+  ): Promise<T> {
+    if (type === 'dataset') {
+      return await this.avala.datasets.get(uid) as T;
+    } else {
+      return await this.avala.projects.get(uid) as T;
+    }
+  }
+  
+  async listResources<T>(
+    fetcher: () => Promise<CursorPage<T>>
+  ): Promise<T[]> {
+    const page = await fetcher();
+    return page.items;
+  }
+}
+
+const client = new TypeSafeClient(avala);
+
+// Type is inferred as Dataset
+const dataset = await client.getResource<Dataset>('dataset', 'uid');
+
+// Type is inferred as Dataset[]
+const datasets = await client.listResources(() => 
+  avala.datasets.list()
+);
+```
+
+## Best practices
+
+<Steps>
+<Step title="Enable strict mode">
+  Use strict TypeScript settings in your `tsconfig.json`:
+
+  ```json
+  {
+    "compilerOptions": {
+      "strict": true,
+      "strictNullChecks": true,
+      "noImplicitAny": true,
+      "esModuleInterop": true
+    }
+  }
+  ```
+</Step>
+
+<Step title="Import types explicitly">
+  Use the `type` keyword for type-only imports:
+
+  ```typescript
+  import { Avala } from '@avala/sdk';
+  import type { Dataset, Project, CursorPage } from '@avala/sdk';
+  ```
+</Step>
+
+<Step title="Use type inference">
+  Let TypeScript infer types when possible:
+
+  ```typescript
+  // Good: Type is inferred
+  const dataset = await avala.datasets.get('uid');
+
+  // Unnecessary: Explicit type
+  const dataset: Dataset = await avala.datasets.get('uid');
+  ```
+</Step>
+
+<Step title="Handle nullable properties">
+  Always check for null values:
+
+  ```typescript
+  const dataset = await avala.datasets.get('uid');
+  
+  // Use nullish coalescing
+  const dataType = dataset.dataType ?? 'unknown';
+  
+  // Use optional chaining
+  const createdDate = dataset.createdAt
+    ? new Date(dataset.createdAt)
+    : null;
+  ```
+</Step>
+</Steps>
+
+<Tip>
+Leverage TypeScript's IntelliSense in your IDE to discover available properties and methods.
+</Tip>
+
+## Advanced patterns
+
+Build sophisticated type-safe abstractions:
+
+```typescript
+import type { Avala, CursorPage } from '@avala/sdk';
+
+type ResourceList<T> = () => Promise<CursorPage<T>>;
+type ResourceGet<T> = (uid: string) => Promise<T>;
+
+class Repository<T extends { uid: string }> {
+  constructor(
+    private list: ResourceList<T>,
+    private get: ResourceGet<T>
+  ) {}
+  
+  async findAll(): Promise<T[]> {
+    const items: T[] = [];
+    let cursor: string | null = null;
+    
+    do {
+      const page = await this.list();
+      items.push(...page.items);
+      cursor = page.nextCursor;
+    } while (cursor !== null);
+    
+    return items;
+  }
+  
+  async findById(uid: string): Promise<T> {
+    return await this.get(uid);
+  }
+  
+  async findByIds(uids: string[]): Promise<T[]> {
+    return await Promise.all(
+      uids.map(uid => this.get(uid))
+    );
+  }
+}
+
+// Usage
+const datasetRepo = new Repository(
+  () => avala.datasets.list(),
+  (uid) => avala.datasets.get(uid)
+);
+
+const allDatasets = await datasetRepo.findAll();
+const dataset = await datasetRepo.findById('dataset-uid');
+```
+
+Created 4 Guides pages successfully

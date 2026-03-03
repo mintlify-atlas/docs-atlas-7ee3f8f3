@@ -1,0 +1,314 @@
+---
+title: Datasets
+description: Manage datasets and their items in the Avala platform
+---
+
+The `DatasetsResource` provides methods to create, list, and retrieve datasets, as well as manage dataset items and sequences.
+
+## Create a dataset
+
+Create a new dataset with the specified configuration.
+
+```typescript
+const dataset = await avala.datasets.create({
+  name: "My Dataset",
+  slug: "my-dataset",
+  dataType: "image",
+  isSequence: false,
+  visibility: "private"
+});
+```
+
+### Parameters
+
+<ParamField path="name" type="string" required>
+  The name of the dataset
+</ParamField>
+
+<ParamField path="slug" type="string" required>
+  The URL-friendly identifier for the dataset
+</ParamField>
+
+<ParamField path="dataType" type="string" required>
+  The type of data in the dataset (e.g., "image", "video", "text")
+</ParamField>
+
+<ParamField path="isSequence" type="boolean">
+  Whether the dataset contains sequences
+</ParamField>
+
+<ParamField path="visibility" type="string">
+  The visibility level of the dataset (e.g., "private", "public")
+</ParamField>
+
+<ParamField path="createMetadata" type="boolean">
+  Whether to create metadata for the dataset
+</ParamField>
+
+<ParamField path="providerConfig" type="Record<string, unknown>">
+  Configuration for the storage provider
+</ParamField>
+
+<ParamField path="ownerName" type="string">
+  The name of the dataset owner
+</ParamField>
+
+### Returns
+
+<ResponseField name="uid" type="string">
+  The unique identifier for the dataset
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The name of the dataset
+</ResponseField>
+
+<ResponseField name="slug" type="string">
+  The URL-friendly identifier
+</ResponseField>
+
+<ResponseField name="itemCount" type="number">
+  The number of items in the dataset
+</ResponseField>
+
+<ResponseField name="dataType" type="string | null">
+  The type of data in the dataset
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null">
+  The timestamp when the dataset was created
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null">
+  The timestamp when the dataset was last updated
+</ResponseField>
+
+## List datasets
+
+Retrieve a paginated list of datasets with optional filtering.
+
+```typescript
+const response = await avala.datasets.list({
+  dataType: "image",
+  status: "active",
+  limit: 50
+});
+```
+
+### Parameters
+
+<ParamField path="dataType" type="string">
+  Filter by data type
+</ParamField>
+
+<ParamField path="name" type="string">
+  Filter by dataset name
+</ParamField>
+
+<ParamField path="status" type="string">
+  Filter by status
+</ParamField>
+
+<ParamField path="visibility" type="string">
+  Filter by visibility level
+</ParamField>
+
+<ParamField path="limit" type="number">
+  Maximum number of results to return
+</ParamField>
+
+<ParamField path="cursor" type="string">
+  Cursor for pagination
+</ParamField>
+
+### Returns
+
+<ResponseField name="items" type="Dataset[]">
+  Array of dataset objects
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether there are more results available
+</ResponseField>
+
+## Get a dataset
+
+Retrieve a specific dataset by its unique identifier.
+
+```typescript
+const dataset = await avala.datasets.get("dataset_uid");
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the dataset
+</ParamField>
+
+### Returns
+
+Returns a `Dataset` object.
+
+## List dataset items
+
+Retrieve a paginated list of items in a dataset.
+
+```typescript
+const response = await avala.datasets.listItems(
+  "owner_name",
+  "dataset-slug",
+  { limit: 100 }
+);
+```
+
+### Parameters
+
+<ParamField path="owner" type="string" required>
+  The name of the dataset owner
+</ParamField>
+
+<ParamField path="slug" type="string" required>
+  The dataset slug
+</ParamField>
+
+<ParamField path="limit" type="number">
+  Maximum number of items to return
+</ParamField>
+
+<ParamField path="cursor" type="string">
+  Cursor for pagination
+</ParamField>
+
+### Returns
+
+<ResponseField name="items" type="DatasetItem[]">
+  Array of dataset item objects
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether there are more results available
+</ResponseField>
+
+## Get a dataset item
+
+Retrieve a specific item from a dataset.
+
+```typescript
+const item = await avala.datasets.getItem(
+  "owner_name",
+  "dataset-slug",
+  "item_uid"
+);
+```
+
+### Parameters
+
+<ParamField path="owner" type="string" required>
+  The name of the dataset owner
+</ParamField>
+
+<ParamField path="slug" type="string" required>
+  The dataset slug
+</ParamField>
+
+<ParamField path="itemUid" type="string" required>
+  The unique identifier of the item
+</ParamField>
+
+### Returns
+
+Returns a `DatasetItem` object with fields including `uid`, `key`, `url`, `metadata`, `annotations`, and timestamps.
+
+## List dataset sequences
+
+Retrieve a paginated list of sequences in a dataset.
+
+```typescript
+const response = await avala.datasets.listSequences(
+  "owner_name",
+  "dataset-slug",
+  { limit: 50 }
+);
+```
+
+### Parameters
+
+<ParamField path="owner" type="string" required>
+  The name of the dataset owner
+</ParamField>
+
+<ParamField path="slug" type="string" required>
+  The dataset slug
+</ParamField>
+
+<ParamField path="limit" type="number">
+  Maximum number of sequences to return
+</ParamField>
+
+<ParamField path="cursor" type="string">
+  Cursor for pagination
+</ParamField>
+
+### Returns
+
+<ResponseField name="items" type="DatasetSequence[]">
+  Array of dataset sequence objects
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether there are more results available
+</ResponseField>
+
+## Get a dataset sequence
+
+Retrieve a specific sequence from a dataset.
+
+```typescript
+const sequence = await avala.datasets.getSequence(
+  "owner_name",
+  "dataset-slug",
+  "sequence_uid"
+);
+```
+
+### Parameters
+
+<ParamField path="owner" type="string" required>
+  The name of the dataset owner
+</ParamField>
+
+<ParamField path="slug" type="string" required>
+  The dataset slug
+</ParamField>
+
+<ParamField path="sequenceUid" type="string" required>
+  The unique identifier of the sequence
+</ParamField>
+
+### Returns
+
+Returns a `DatasetSequence` object with fields including `uid`, `key`, `status`, `numberOfFrames`, `views`, and `frames`.

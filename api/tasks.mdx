@@ -1,0 +1,98 @@
+---
+title: Tasks
+description: Manage tasks in the Avala platform
+---
+
+The `TasksResource` provides methods to list and retrieve tasks associated with projects.
+
+## List tasks
+
+Retrieve a paginated list of tasks with optional filtering.
+
+```typescript
+const response = await avala.tasks.list({
+  project: "project_uid",
+  status: "completed",
+  limit: 50
+});
+```
+
+### Parameters
+
+<ParamField path="project" type="string">
+  Filter by project UID
+</ParamField>
+
+<ParamField path="status" type="string">
+  Filter by task status
+</ParamField>
+
+<ParamField path="limit" type="number">
+  Maximum number of results to return
+</ParamField>
+
+<ParamField path="cursor" type="string">
+  Cursor for pagination
+</ParamField>
+
+### Returns
+
+<ResponseField name="items" type="Task[]">
+  Array of task objects
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether there are more results available
+</ResponseField>
+
+## Get a task
+
+Retrieve a specific task by its unique identifier.
+
+```typescript
+const task = await avala.tasks.get("task_uid");
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the task
+</ParamField>
+
+### Returns
+
+<ResponseField name="uid" type="string">
+  The unique identifier for the task
+</ResponseField>
+
+<ResponseField name="type" type="string | null">
+  The type of the task
+</ResponseField>
+
+<ResponseField name="name" type="string | null">
+  The name of the task
+</ResponseField>
+
+<ResponseField name="status" type="string | null">
+  The current status of the task
+</ResponseField>
+
+<ResponseField name="project" type="string | null">
+  The project UID this task belongs to
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null">
+  The timestamp when the task was created
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null">
+  The timestamp when the task was last updated
+</ResponseField>

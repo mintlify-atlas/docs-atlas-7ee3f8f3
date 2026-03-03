@@ -1,0 +1,200 @@
+---
+title: Auto-label jobs
+description: Automate annotation with machine learning models
+---
+
+Auto-label jobs allow you to automatically generate annotations using machine learning models. Configure confidence thresholds, select specific labels, and run dry runs to preview results before applying them to your project.
+
+## List auto-label jobs
+
+Retrieve a paginated list of auto-label jobs.
+
+```typescript
+const jobs = await avala.autoLabelJobs.list({
+  project: 'project-uid',
+  status: 'completed',
+  limit: 50,
+  cursor: 'next-cursor'
+});
+```
+
+### Parameters
+
+<ParamField path="options.project" type="string" optional>
+  Filter by project UID
+</ParamField>
+
+<ParamField path="options.status" type="string" optional>
+  Filter by job status (e.g., 'pending', 'running', 'completed', 'failed')
+</ParamField>
+
+<ParamField path="options.limit" type="number" optional>
+  Maximum number of jobs to return per page
+</ParamField>
+
+<ParamField path="options.cursor" type="string" optional>
+  Cursor for pagination
+</ParamField>
+
+### Returns
+
+Returns a cursor-paginated list of auto-label job objects.
+
+<ResponseField name="items" type="AutoLabelJob[]">
+  Array of auto-label job objects
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether more results are available
+</ResponseField>
+
+## Get an auto-label job
+
+Retrieve a specific auto-label job by UID.
+
+```typescript
+const job = await avala.autoLabelJobs.get('job-uid');
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the auto-label job
+</ParamField>
+
+### Returns
+
+Returns the auto-label job object.
+
+<ResponseField name="uid" type="string">
+  Unique identifier for the job
+</ResponseField>
+
+<ResponseField name="status" type="string | null">
+  Current status of the job
+</ResponseField>
+
+<ResponseField name="modelType" type="string | null">
+  Type of model used for auto-labeling
+</ResponseField>
+
+<ResponseField name="confidenceThreshold" type="number | null">
+  Minimum confidence threshold for predictions
+</ResponseField>
+
+<ResponseField name="labels" type="string[]">
+  Labels to auto-label
+</ResponseField>
+
+<ResponseField name="dryRun" type="boolean">
+  Whether this is a dry run (preview only)
+</ResponseField>
+
+<ResponseField name="totalItems" type="number">
+  Total number of items to process
+</ResponseField>
+
+<ResponseField name="processedItems" type="number">
+  Number of items processed so far
+</ResponseField>
+
+<ResponseField name="successfulItems" type="number">
+  Number of items successfully labeled
+</ResponseField>
+
+<ResponseField name="failedItems" type="number">
+  Number of items that failed
+</ResponseField>
+
+<ResponseField name="skippedItems" type="number">
+  Number of items skipped
+</ResponseField>
+
+<ResponseField name="progressPct" type="number | null">
+  Progress percentage (0-100)
+</ResponseField>
+
+<ResponseField name="errorMessage" type="string | null">
+  Error message if the job failed
+</ResponseField>
+
+<ResponseField name="summary" type="object | null">
+  Summary of results
+</ResponseField>
+
+<ResponseField name="startedAt" type="string | null">
+  ISO 8601 timestamp of when the job started
+</ResponseField>
+
+<ResponseField name="completedAt" type="string | null">
+  ISO 8601 timestamp of when the job completed
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null">
+  ISO 8601 timestamp of when the job was created
+</ResponseField>
+
+## Create an auto-label job
+
+Create a new auto-label job for a project.
+
+```typescript
+const job = await avala.autoLabelJobs.create('project-uid', {
+  modelType: 'yolov8',
+  confidenceThreshold: 0.7,
+  labels: ['person', 'car', 'bicycle'],
+  dryRun: true
+});
+```
+
+### Parameters
+
+<ParamField path="projectUid" type="string" required>
+  The unique identifier of the project
+</ParamField>
+
+<ParamField path="options.modelType" type="string" optional>
+  Type of model to use for auto-labeling (e.g., 'yolov8', 'sam')
+</ParamField>
+
+<ParamField path="options.confidenceThreshold" type="number" optional>
+  Minimum confidence threshold for accepting predictions (0.0 to 1.0)
+</ParamField>
+
+<ParamField path="options.labels" type="string[]" optional>
+  Specific labels to auto-label. If not provided, all labels will be used
+</ParamField>
+
+<ParamField path="options.dryRun" type="boolean" optional>
+  If true, preview results without applying annotations
+</ParamField>
+
+### Returns
+
+Returns the created auto-label job object.
+
+## Cancel an auto-label job
+
+Cancel a running auto-label job.
+
+```typescript
+await avala.autoLabelJobs.cancel('job-uid');
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the job to cancel
+</ParamField>
+
+### Returns
+
+Returns void on success.

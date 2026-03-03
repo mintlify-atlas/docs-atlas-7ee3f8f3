@@ -1,0 +1,236 @@
+---
+title: Projects
+description: Organize your annotation and labeling workflows with projects
+---
+
+Projects are workspaces for managing annotation tasks, team collaboration, and workflow configuration in Avala.
+
+## Overview
+
+A project represents a discrete annotation or labeling effort. Projects help you:
+
+- Organize related tasks and datasets
+- Configure annotation workflows
+- Manage team assignments
+- Track progress and quality metrics
+- Define task types and label schemas
+
+Each project has a unique identifier (`uid`), a name, status, and timestamps for creation and updates.
+
+## Project structure
+
+```typescript
+interface Project {
+  uid: string;
+  name: string;
+  status: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+```
+
+## Listing projects
+
+Retrieve all projects accessible to your account:
+
+```typescript
+const page = await avala.projects.list({
+  limit: 25
+});
+
+for (const project of page.items) {
+  console.log(`${project.name} (${project.status})`);
+}
+
+// Handle pagination
+if (page.hasMore) {
+  const nextPage = await avala.projects.list({
+    cursor: page.nextCursor,
+    limit: 25
+  });
+}
+```
+
+### Pagination
+
+Projects are returned in paginated responses:
+
+<ParamField path="limit" type="number">
+  Maximum number of projects to return (default: 20)
+</ParamField>
+
+<ParamField path="cursor" type="string">
+  Cursor for fetching the next page of results
+</ParamField>
+
+<Note>
+  The response includes `hasMore`, `nextCursor`, and `previousCursor` fields for navigation.
+</Note>
+
+## Getting a project
+
+Retrieve detailed information about a specific project:
+
+```typescript
+const project = await avala.projects.get('project_uid_here');
+
+console.log(project.name);
+console.log(project.status);
+console.log(project.createdAt);
+```
+
+## Working with projects and tasks
+
+Projects are closely related to tasks. You can filter tasks by project:
+
+<Steps>
+  <Step title="Get the project">
+    First, retrieve the project you want to work with:
+
+    ```typescript
+    const project = await avala.projects.get('project_uid');
+    ```
+  </Step>
+
+  <Step title="List tasks for the project">
+    Use the tasks resource to filter by project:
+
+    ```typescript
+    const tasks = await avala.tasks.list({
+      project: project.uid,
+      status: 'completed'
+    });
+
+    console.log(`Found ${tasks.items.length} completed tasks`);
+    ```
+  </Step>
+</Steps>
+
+## Project status
+
+Projects track their lifecycle through status values:
+
+<AccordionGroup>
+  <Accordion title="Active">
+    The project is currently in progress and accepting new tasks
+  </Accordion>
+  
+  <Accordion title="Completed">
+    All tasks have been finished and the project is closed
+  </Accordion>
+  
+  <Accordion title="Paused">
+    The project is temporarily on hold
+  </Accordion>
+  
+  <Accordion title="Archived">
+    The project has been archived for historical reference
+  </Accordion>
+</AccordionGroup>
+
+## Common workflows
+
+<Tabs>
+  <Tab title="List all projects">
+    ```typescript
+    const projects = await avala.projects.list();
+    
+    for (const project of projects.items) {
+      console.log(project.name);
+    }
+    ```
+  </Tab>
+
+  <Tab title="Get project details">
+    ```typescript
+    const project = await avala.projects.get('proj_123');
+    
+    console.log(`Project: ${project.name}`);
+    console.log(`Status: ${project.status}`);
+    console.log(`Created: ${project.createdAt}`);
+    ```
+  </Tab>
+
+  <Tab title="Find project tasks">
+    ```typescript
+    // Get project
+    const project = await avala.projects.get('proj_123');
+    
+    // Get all tasks for this project
+    const tasks = await avala.tasks.list({
+      project: project.uid
+    });
+    
+    console.log(`${tasks.items.length} tasks`);
+    ```
+  </Tab>
+
+  <Tab title="Paginate projects">
+    ```typescript
+    let cursor: string | null = null;
+    const allProjects = [];
+    
+    do {
+      const page = await avala.projects.list({
+        limit: 50,
+        cursor: cursor || undefined
+      });
+      
+      allProjects.push(...page.items);
+      cursor = page.nextCursor;
+    } while (cursor);
+    
+    console.log(`Total: ${allProjects.length} projects`);
+    ```
+  </Tab>
+</Tabs>
+
+## Response format
+
+All project list operations return a paginated response:
+
+```typescript
+interface CursorPage<Project> {
+  items: Project[];
+  nextCursor: string | null;
+  previousCursor: string | null;
+  hasMore: boolean;
+}
+```
+
+<Info>
+  Use `hasMore` to determine if additional pages are available.
+</Info>
+
+## Integration with other resources
+
+Projects connect to multiple Avala resources:
+
+<CardGroup cols={2}>
+  <Card title="Tasks" icon="list-check">
+    Projects contain annotation tasks. Filter tasks by `project` UID.
+  </Card>
+  
+  <Card title="Exports" icon="download">
+    Export project annotations and results using the exports resource.
+  </Card>
+  
+  <Card title="Agents" icon="robot">
+    Configure AI agents to automate workflows within a project.
+  </Card>
+  
+  <Card title="Quality Targets" icon="bullseye">
+    Set quality metrics and thresholds for project deliverables.
+  </Card>
+</CardGroup>
+
+## Best practices
+
+- **Organize by purpose**: Create separate projects for training, validation, and testing datasets
+- **Monitor status**: Regularly check project status to track progress
+- **Use pagination**: Always handle paginated responses when listing projects
+- **Link resources**: Associate tasks, agents, and quality targets with projects for better organization
+
+<Tip>
+  Project UIDs are stable identifiers. Store them in your application to reference projects consistently.
+</Tip>

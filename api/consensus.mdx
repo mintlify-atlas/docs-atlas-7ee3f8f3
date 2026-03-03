@@ -1,0 +1,229 @@
+---
+title: Consensus
+description: Measure annotation agreement across multiple annotators
+---
+
+Consensus enables you to measure inter-annotator agreement for quality assurance. Configure consensus thresholds and compute agreement scores to identify items that need review.
+
+## Get consensus summary
+
+Retrieve a summary of consensus scores for a project.
+
+```typescript
+const summary = await avala.consensus.getSummary('project-uid');
+```
+
+### Parameters
+
+<ParamField path="projectUid" type="string" required>
+  The unique identifier of the project
+</ParamField>
+
+### Returns
+
+<ResponseField name="meanScore" type="number">
+  Mean consensus score across all items
+</ResponseField>
+
+<ResponseField name="medianScore" type="number">
+  Median consensus score
+</ResponseField>
+
+<ResponseField name="minScore" type="number">
+  Minimum consensus score
+</ResponseField>
+
+<ResponseField name="maxScore" type="number">
+  Maximum consensus score
+</ResponseField>
+
+<ResponseField name="totalItems" type="number">
+  Total number of items evaluated
+</ResponseField>
+
+<ResponseField name="itemsWithConsensus" type="number">
+  Number of items with consensus agreement
+</ResponseField>
+
+<ResponseField name="scoreDistribution" type="object | null">
+  Distribution of scores across ranges
+</ResponseField>
+
+<ResponseField name="byTaskName" type="unknown[] | null">
+  Consensus breakdown by task name
+</ResponseField>
+
+## List consensus scores
+
+Retrieve paginated consensus scores for individual items.
+
+```typescript
+const scores = await avala.consensus.listScores('project-uid', {
+  limit: 50,
+  cursor: 'next-cursor'
+});
+```
+
+### Parameters
+
+<ParamField path="projectUid" type="string" required>
+  The unique identifier of the project
+</ParamField>
+
+<ParamField path="options.limit" type="number" optional>
+  Maximum number of scores to return per page
+</ParamField>
+
+<ParamField path="options.cursor" type="string" optional>
+  Cursor for pagination
+</ParamField>
+
+### Returns
+
+Returns a cursor-paginated list of consensus score objects.
+
+<ResponseField name="items" type="ConsensusScore[]">
+  Array of consensus score objects
+</ResponseField>
+
+<ResponseField name="items[].uid" type="string">
+  Unique identifier for the score record
+</ResponseField>
+
+<ResponseField name="items[].datasetItemUid" type="string">
+  Dataset item UID being evaluated
+</ResponseField>
+
+<ResponseField name="items[].taskName" type="string">
+  Task name
+</ResponseField>
+
+<ResponseField name="items[].scoreType" type="string | null">
+  Type of score (e.g., 'iou', 'agreement')
+</ResponseField>
+
+<ResponseField name="items[].score" type="number">
+  Consensus score value
+</ResponseField>
+
+<ResponseField name="items[].annotatorCount" type="number">
+  Number of annotators who labeled this item
+</ResponseField>
+
+<ResponseField name="items[].details" type="object | null">
+  Additional details about the score
+</ResponseField>
+
+<ResponseField name="items[].createdAt" type="string | null">
+  ISO 8601 timestamp of when the score was computed
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether more results are available
+</ResponseField>
+
+## Compute consensus
+
+Trigger consensus computation for a project.
+
+```typescript
+const result = await avala.consensus.compute('project-uid');
+```
+
+### Parameters
+
+<ParamField path="projectUid" type="string" required>
+  The unique identifier of the project
+</ParamField>
+
+### Returns
+
+<ResponseField name="status" type="string">
+  Status of the computation request
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Description of the computation result
+</ResponseField>
+
+## Get consensus config
+
+Retrieve the consensus configuration for a project.
+
+```typescript
+const config = await avala.consensus.getConfig('project-uid');
+```
+
+### Parameters
+
+<ParamField path="projectUid" type="string" required>
+  The unique identifier of the project
+</ParamField>
+
+### Returns
+
+<ResponseField name="uid" type="string">
+  Unique identifier for the config
+</ResponseField>
+
+<ResponseField name="iouThreshold" type="number">
+  Intersection over Union threshold for object matching
+</ResponseField>
+
+<ResponseField name="minAgreementRatio" type="number">
+  Minimum agreement ratio to consider consensus (0.0 to 1.0)
+</ResponseField>
+
+<ResponseField name="minAnnotations" type="number">
+  Minimum number of annotations required for consensus
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null">
+  ISO 8601 timestamp of creation
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null">
+  ISO 8601 timestamp of last update
+</ResponseField>
+
+## Update consensus config
+
+Update the consensus configuration for a project.
+
+```typescript
+const config = await avala.consensus.updateConfig('project-uid', {
+  iouThreshold: 0.5,
+  minAgreementRatio: 0.8,
+  minAnnotations: 3
+});
+```
+
+### Parameters
+
+<ParamField path="projectUid" type="string" required>
+  The unique identifier of the project
+</ParamField>
+
+<ParamField path="options.iouThreshold" type="number" optional>
+  New IOU threshold for object matching (0.0 to 1.0)
+</ParamField>
+
+<ParamField path="options.minAgreementRatio" type="number" optional>
+  New minimum agreement ratio (0.0 to 1.0)
+</ParamField>
+
+<ParamField path="options.minAnnotations" type="number" optional>
+  New minimum number of annotations required
+</ParamField>
+
+### Returns
+
+Returns the updated consensus config object.

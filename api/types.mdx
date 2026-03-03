@@ -1,0 +1,1830 @@
+---
+title: Types
+description: TypeScript types and interfaces for the Avala SDK
+---
+
+## Configuration types
+
+### AvalaConfig
+
+Configuration options for initializing the Avala client.
+
+<ResponseField name="apiKey" type="string" optional>
+  API key for authentication. Can also be set via `AVALA_API_KEY` environment variable.
+</ResponseField>
+
+<ResponseField name="baseUrl" type="string" optional>
+  Base URL for the Avala API. Defaults to `https://api.avala.ai`.
+</ResponseField>
+
+<ResponseField name="timeout" type="number" optional>
+  Request timeout in milliseconds. Defaults to 60000 (60 seconds).
+</ResponseField>
+
+## Resource types
+
+### Dataset
+
+Represents a dataset in Avala.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the dataset.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Display name of the dataset.
+</ResponseField>
+
+<ResponseField name="slug" type="string" required>
+  URL-friendly identifier for the dataset.
+</ResponseField>
+
+<ResponseField name="itemCount" type="number" required>
+  Number of items in the dataset.
+</ResponseField>
+
+<ResponseField name="dataType" type="string | null" required>
+  Type of data stored in the dataset (e.g., "image", "video", "pointcloud").
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the dataset was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the dataset was last updated.
+</ResponseField>
+
+### Project
+
+Represents an annotation project.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the project.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Display name of the project.
+</ResponseField>
+
+<ResponseField name="status" type="string | null" required>
+  Current status of the project.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the project was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the project was last updated.
+</ResponseField>
+
+### Export
+
+Represents a dataset export.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the export.
+</ResponseField>
+
+<ResponseField name="status" type="string | null" required>
+  Current status of the export (e.g., "pending", "processing", "completed", "failed").
+</ResponseField>
+
+<ResponseField name="downloadUrl" type="string | null" required>
+  URL to download the export once completed.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the export was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the export was last updated.
+</ResponseField>
+
+### Task
+
+Represents an annotation task.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the task.
+</ResponseField>
+
+<ResponseField name="type" type="string | null" required>
+  Type of annotation task (e.g., "bounding_box", "segmentation").
+</ResponseField>
+
+<ResponseField name="name" type="string | null" required>
+  Display name of the task.
+</ResponseField>
+
+<ResponseField name="status" type="string | null" required>
+  Current status of the task.
+</ResponseField>
+
+<ResponseField name="project" type="string | null" required>
+  UID of the project this task belongs to.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the task was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the task was last updated.
+</ResponseField>
+
+### StorageConfig
+
+Represents a storage configuration for cloud storage integration.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the storage configuration.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Display name of the storage configuration.
+</ResponseField>
+
+<ResponseField name="provider" type="string" required>
+  Storage provider type (e.g., "aws_s3", "google_cloud_storage").
+</ResponseField>
+
+<ResponseField name="s3BucketName" type="string | null" required>
+  AWS S3 bucket name (for S3 provider).
+</ResponseField>
+
+<ResponseField name="s3BucketRegion" type="string | null" required>
+  AWS S3 bucket region (for S3 provider).
+</ResponseField>
+
+<ResponseField name="s3BucketPrefix" type="string | null" required>
+  AWS S3 bucket prefix/path (for S3 provider).
+</ResponseField>
+
+<ResponseField name="s3IsAccelerated" type="boolean" required>
+  Whether S3 transfer acceleration is enabled.
+</ResponseField>
+
+<ResponseField name="gcStorageBucketName" type="string | null" required>
+  Google Cloud Storage bucket name (for GCS provider).
+</ResponseField>
+
+<ResponseField name="gcStoragePrefix" type="string | null" required>
+  Google Cloud Storage bucket prefix/path (for GCS provider).
+</ResponseField>
+
+<ResponseField name="isVerified" type="boolean" required>
+  Whether the storage configuration has been verified.
+</ResponseField>
+
+<ResponseField name="lastVerifiedAt" type="string | null" required>
+  ISO 8601 timestamp of when the configuration was last verified.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the configuration was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the configuration was last updated.
+</ResponseField>
+
+## Dataset items and sequences
+
+### DatasetItem
+
+Represents a single item in a dataset.
+
+<ResponseField name="id" type="number | null" required>
+  Numeric ID of the dataset item.
+</ResponseField>
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the dataset item.
+</ResponseField>
+
+<ResponseField name="key" type="string | null" required>
+  Unique key for the item within the dataset.
+</ResponseField>
+
+<ResponseField name="dataset" type="string | null" required>
+  UID of the dataset this item belongs to.
+</ResponseField>
+
+<ResponseField name="url" type="string | null" required>
+  URL to access the item's data.
+</ResponseField>
+
+<ResponseField name="gpuTextureUrl" type="string | null" required>
+  GPU-optimized texture URL for 3D data.
+</ResponseField>
+
+<ResponseField name="thumbnails" type="string[]" required>
+  Array of thumbnail URLs for the item.
+</ResponseField>
+
+<ResponseField name="videoThumbnail" type="string | null" required>
+  Thumbnail URL for video items.
+</ResponseField>
+
+<ResponseField name="metadata" type="Record<string, unknown> | null" required>
+  Custom metadata associated with the item.
+</ResponseField>
+
+<ResponseField name="exportSnippet" type="Record<string, unknown> | null" required>
+  Export-specific data for the item.
+</ResponseField>
+
+<ResponseField name="annotations" type="Record<string, unknown> | null" required>
+  Annotations associated with the item.
+</ResponseField>
+
+<ResponseField name="cropData" type="Record<string, unknown> | null" required>
+  Crop data for the item.
+</ResponseField>
+
+<ResponseField name="relatedItems" type="Record<string, unknown>[]" required>
+  Array of related dataset items.
+</ResponseField>
+
+<ResponseField name="relatedSequenceUid" type="string | null" required>
+  UID of the related sequence, if this item is part of a sequence.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the item was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the item was last updated.
+</ResponseField>
+
+### DatasetSequence
+
+Represents a sequence of related dataset items (e.g., video frames, sensor data over time).
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the sequence.
+</ResponseField>
+
+<ResponseField name="key" type="string | null" required>
+  Unique key for the sequence within the dataset.
+</ResponseField>
+
+<ResponseField name="customUuid" type="string | null" required>
+  Custom UUID for the sequence.
+</ResponseField>
+
+<ResponseField name="status" type="string | null" required>
+  Current status of the sequence.
+</ResponseField>
+
+<ResponseField name="featuredImage" type="string | null" required>
+  URL of the featured/thumbnail image for the sequence.
+</ResponseField>
+
+<ResponseField name="numberOfFrames" type="number | null" required>
+  Total number of frames in the sequence.
+</ResponseField>
+
+<ResponseField name="views" type="Record<string, unknown>[]" required>
+  Array of view configurations for the sequence.
+</ResponseField>
+
+<ResponseField name="cropData" type="Record<string, unknown> | null" required>
+  Crop data for the sequence.
+</ResponseField>
+
+<ResponseField name="predefinedLabels" type="Record<string, unknown>[]" required>
+  Array of predefined labels for the sequence.
+</ResponseField>
+
+<ResponseField name="frames" type="Record<string, unknown>[]" required>
+  Array of frames in the sequence.
+</ResponseField>
+
+<ResponseField name="metrics" type="Record<string, unknown> | null" required>
+  Metrics associated with the sequence.
+</ResponseField>
+
+<ResponseField name="datasetUid" type="string | null" required>
+  UID of the dataset this sequence belongs to.
+</ResponseField>
+
+<ResponseField name="allowLidarCalibration" type="boolean | null" required>
+  Whether LiDAR calibration is allowed for this sequence.
+</ResponseField>
+
+<ResponseField name="lidarCalibrationEnabled" type="boolean | null" required>
+  Whether LiDAR calibration is enabled.
+</ResponseField>
+
+<ResponseField name="cameraCalibrationEnabled" type="boolean | null" required>
+  Whether camera calibration is enabled.
+</ResponseField>
+
+### SliceItem
+
+Represents an item in a slice (filtered view of a dataset).
+
+<ResponseField name="id" type="number | null" required>
+  Numeric ID of the slice item.
+</ResponseField>
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the slice item.
+</ResponseField>
+
+<ResponseField name="key" type="string | null" required>
+  Unique key for the item.
+</ResponseField>
+
+<ResponseField name="dataset" type="string | null" required>
+  UID of the source dataset.
+</ResponseField>
+
+<ResponseField name="url" type="string | null" required>
+  URL to access the item's data.
+</ResponseField>
+
+<ResponseField name="gpuTextureUrl" type="string | null" required>
+  GPU-optimized texture URL for 3D data.
+</ResponseField>
+
+<ResponseField name="thumbnails" type="string[]" required>
+  Array of thumbnail URLs for the item.
+</ResponseField>
+
+<ResponseField name="videoThumbnail" type="string | null" required>
+  Thumbnail URL for video items.
+</ResponseField>
+
+<ResponseField name="metadata" type="Record<string, unknown> | null" required>
+  Custom metadata associated with the item.
+</ResponseField>
+
+<ResponseField name="exportSnippet" type="Record<string, unknown> | null" required>
+  Export-specific data for the item.
+</ResponseField>
+
+<ResponseField name="annotations" type="Record<string, unknown> | null" required>
+  Annotations associated with the item.
+</ResponseField>
+
+<ResponseField name="cropData" type="Record<string, unknown> | null" required>
+  Crop data for the item.
+</ResponseField>
+
+<ResponseField name="relatedItems" type="Record<string, unknown>[]" required>
+  Array of related dataset items.
+</ResponseField>
+
+<ResponseField name="relatedSequenceUid" type="string | null" required>
+  UID of the related sequence.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the item was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the item was last updated.
+</ResponseField>
+
+## Agent and automation types
+
+### Agent
+
+Represents an AI agent that can be triggered by events.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the agent.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Display name of the agent.
+</ResponseField>
+
+<ResponseField name="description" type="string | null" required>
+  Description of what the agent does.
+</ResponseField>
+
+<ResponseField name="events" type="string[]" required>
+  Array of event types that trigger this agent.
+</ResponseField>
+
+<ResponseField name="callbackUrl" type="string | null" required>
+  URL to call when the agent is triggered.
+</ResponseField>
+
+<ResponseField name="isActive" type="boolean" required>
+  Whether the agent is currently active.
+</ResponseField>
+
+<ResponseField name="project" type="string | null" required>
+  UID of the project this agent is associated with.
+</ResponseField>
+
+<ResponseField name="taskTypes" type="string[]" required>
+  Array of task types this agent can handle.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the agent was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the agent was last updated.
+</ResponseField>
+
+### AgentExecution
+
+Represents a single execution of an agent.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the execution.
+</ResponseField>
+
+<ResponseField name="registration" type="string" required>
+  UID of the agent registration.
+</ResponseField>
+
+<ResponseField name="eventType" type="string" required>
+  Type of event that triggered this execution.
+</ResponseField>
+
+<ResponseField name="task" type="string | null" required>
+  UID of the task this execution is associated with.
+</ResponseField>
+
+<ResponseField name="result" type="string | null" required>
+  Result of the execution.
+</ResponseField>
+
+<ResponseField name="status" type="string | null" required>
+  Current status of the execution (e.g., "pending", "running", "completed", "failed").
+</ResponseField>
+
+<ResponseField name="action" type="string | null" required>
+  Action taken by the agent.
+</ResponseField>
+
+<ResponseField name="eventPayload" type="Record<string, unknown> | null" required>
+  Payload of the event that triggered the execution.
+</ResponseField>
+
+<ResponseField name="responsePayload" type="Record<string, unknown> | null" required>
+  Response payload from the agent.
+</ResponseField>
+
+<ResponseField name="errorMessage" type="string | null" required>
+  Error message if the execution failed.
+</ResponseField>
+
+<ResponseField name="startedAt" type="string | null" required>
+  ISO 8601 timestamp of when the execution started.
+</ResponseField>
+
+<ResponseField name="completedAt" type="string | null" required>
+  ISO 8601 timestamp of when the execution completed.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the execution was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the execution was last updated.
+</ResponseField>
+
+### InferenceProvider
+
+Represents an AI model provider for inference.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the inference provider.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Display name of the provider.
+</ResponseField>
+
+<ResponseField name="description" type="string | null" required>
+  Description of the provider.
+</ResponseField>
+
+<ResponseField name="providerType" type="string | null" required>
+  Type of provider (e.g., "openai", "anthropic", "custom").
+</ResponseField>
+
+<ResponseField name="config" type="Record<string, unknown> | null" required>
+  Configuration for the provider.
+</ResponseField>
+
+<ResponseField name="isActive" type="boolean" required>
+  Whether the provider is currently active.
+</ResponseField>
+
+<ResponseField name="project" type="string | null" required>
+  UID of the project this provider is associated with.
+</ResponseField>
+
+<ResponseField name="lastTestAt" type="string | null" required>
+  ISO 8601 timestamp of when the provider was last tested.
+</ResponseField>
+
+<ResponseField name="lastTestSuccess" type="boolean | null" required>
+  Whether the last test was successful.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the provider was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the provider was last updated.
+</ResponseField>
+
+### AutoLabelJob
+
+Represents an automatic labeling job.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the auto-label job.
+</ResponseField>
+
+<ResponseField name="status" type="string | null" required>
+  Current status of the job (e.g., "pending", "running", "completed", "failed").
+</ResponseField>
+
+<ResponseField name="modelType" type="string | null" required>
+  Type of model used for auto-labeling.
+</ResponseField>
+
+<ResponseField name="confidenceThreshold" type="number | null" required>
+  Minimum confidence threshold for applying labels.
+</ResponseField>
+
+<ResponseField name="labels" type="string[]" required>
+  Array of labels to apply.
+</ResponseField>
+
+<ResponseField name="dryRun" type="boolean" required>
+  Whether this is a dry run (no actual labels applied).
+</ResponseField>
+
+<ResponseField name="totalItems" type="number" required>
+  Total number of items to process.
+</ResponseField>
+
+<ResponseField name="processedItems" type="number" required>
+  Number of items processed so far.
+</ResponseField>
+
+<ResponseField name="successfulItems" type="number" required>
+  Number of items successfully labeled.
+</ResponseField>
+
+<ResponseField name="failedItems" type="number" required>
+  Number of items that failed to label.
+</ResponseField>
+
+<ResponseField name="skippedItems" type="number" required>
+  Number of items skipped.
+</ResponseField>
+
+<ResponseField name="progressPct" type="number | null" required>
+  Progress percentage (0-100).
+</ResponseField>
+
+<ResponseField name="errorMessage" type="string | null" required>
+  Error message if the job failed.
+</ResponseField>
+
+<ResponseField name="summary" type="Record<string, unknown> | null" required>
+  Summary of the job results.
+</ResponseField>
+
+<ResponseField name="startedAt" type="string | null" required>
+  ISO 8601 timestamp of when the job started.
+</ResponseField>
+
+<ResponseField name="completedAt" type="string | null" required>
+  ISO 8601 timestamp of when the job completed.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the job was created.
+</ResponseField>
+
+## Quality and consensus types
+
+### QualityTarget
+
+Represents a quality metric target.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the quality target.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Display name of the target.
+</ResponseField>
+
+<ResponseField name="metric" type="string" required>
+  Metric to measure (e.g., "iou", "accuracy").
+</ResponseField>
+
+<ResponseField name="operator" type="string" required>
+  Comparison operator (e.g., "gt", "lt", "eq").
+</ResponseField>
+
+<ResponseField name="threshold" type="number" required>
+  Threshold value for the metric.
+</ResponseField>
+
+<ResponseField name="severity" type="string | null" required>
+  Severity level if the target is breached (e.g., "low", "medium", "high").
+</ResponseField>
+
+<ResponseField name="isActive" type="boolean" required>
+  Whether the target is currently active.
+</ResponseField>
+
+<ResponseField name="notifyWebhook" type="boolean" required>
+  Whether to send webhook notifications on breach.
+</ResponseField>
+
+<ResponseField name="notifyEmails" type="string[]" required>
+  Array of email addresses to notify on breach.
+</ResponseField>
+
+<ResponseField name="lastEvaluatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the target was last evaluated.
+</ResponseField>
+
+<ResponseField name="lastValue" type="number | null" required>
+  Last measured value of the metric.
+</ResponseField>
+
+<ResponseField name="isBreached" type="boolean" required>
+  Whether the target is currently breached.
+</ResponseField>
+
+<ResponseField name="breachCount" type="number" required>
+  Number of times the target has been breached.
+</ResponseField>
+
+<ResponseField name="lastBreachedAt" type="string | null" required>
+  ISO 8601 timestamp of when the target was last breached.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the target was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the target was last updated.
+</ResponseField>
+
+### QualityTargetEvaluation
+
+Represents the evaluation of a quality target.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the evaluation.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Name of the quality target.
+</ResponseField>
+
+<ResponseField name="metric" type="string" required>
+  Metric being measured.
+</ResponseField>
+
+<ResponseField name="threshold" type="number" required>
+  Threshold value for the metric.
+</ResponseField>
+
+<ResponseField name="operator" type="string" required>
+  Comparison operator used.
+</ResponseField>
+
+<ResponseField name="currentValue" type="number" required>
+  Current value of the metric.
+</ResponseField>
+
+<ResponseField name="isBreached" type="boolean" required>
+  Whether the target is breached.
+</ResponseField>
+
+<ResponseField name="severity" type="string | null" required>
+  Severity level of the breach.
+</ResponseField>
+
+### ConsensusConfig
+
+Configuration for consensus scoring.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the consensus configuration.
+</ResponseField>
+
+<ResponseField name="iouThreshold" type="number" required>
+  Intersection over Union (IoU) threshold for agreement.
+</ResponseField>
+
+<ResponseField name="minAgreementRatio" type="number" required>
+  Minimum agreement ratio (0-1) required for consensus.
+</ResponseField>
+
+<ResponseField name="minAnnotations" type="number" required>
+  Minimum number of annotations required.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the configuration was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the configuration was last updated.
+</ResponseField>
+
+### ConsensusScore
+
+Represents a consensus score for an annotated item.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the consensus score.
+</ResponseField>
+
+<ResponseField name="datasetItemUid" type="string" required>
+  UID of the dataset item.
+</ResponseField>
+
+<ResponseField name="taskName" type="string" required>
+  Name of the task.
+</ResponseField>
+
+<ResponseField name="scoreType" type="string | null" required>
+  Type of score (e.g., "iou", "exact_match").
+</ResponseField>
+
+<ResponseField name="score" type="number" required>
+  Consensus score value (typically 0-1).
+</ResponseField>
+
+<ResponseField name="annotatorCount" type="number" required>
+  Number of annotators whose annotations were considered.
+</ResponseField>
+
+<ResponseField name="details" type="Record<string, unknown> | null" required>
+  Additional details about the consensus calculation.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the score was created.
+</ResponseField>
+
+### ConsensusSummary
+
+Summary statistics for consensus scores.
+
+<ResponseField name="meanScore" type="number" required>
+  Mean consensus score across all items.
+</ResponseField>
+
+<ResponseField name="medianScore" type="number" required>
+  Median consensus score across all items.
+</ResponseField>
+
+<ResponseField name="minScore" type="number" required>
+  Minimum consensus score.
+</ResponseField>
+
+<ResponseField name="maxScore" type="number" required>
+  Maximum consensus score.
+</ResponseField>
+
+<ResponseField name="totalItems" type="number" required>
+  Total number of items scored.
+</ResponseField>
+
+<ResponseField name="itemsWithConsensus" type="number" required>
+  Number of items that meet the consensus threshold.
+</ResponseField>
+
+<ResponseField name="scoreDistribution" type="Record<string, unknown> | null" required>
+  Distribution of scores across ranges.
+</ResponseField>
+
+<ResponseField name="byTaskName" type="unknown[] | null" required>
+  Breakdown of scores by task name.
+</ResponseField>
+
+### ConsensusComputeResult
+
+Result of a consensus computation operation.
+
+<ResponseField name="status" type="string" required>
+  Status of the computation (e.g., "success", "failed").
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+  Message describing the result.
+</ResponseField>
+
+## Annotation issues
+
+### AnnotationIssue
+
+Represents a reported issue with an annotation.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the issue.
+</ResponseField>
+
+<ResponseField name="datasetItemUid" type="string | null" required>
+  UID of the dataset item with the issue.
+</ResponseField>
+
+<ResponseField name="sequenceUid" type="string | null" required>
+  UID of the sequence with the issue.
+</ResponseField>
+
+<ResponseField name="project" type="AnnotationIssueProject | null" required>
+  Project information.
+</ResponseField>
+
+<ResponseField name="reporter" type="AnnotationIssueReporter | null" required>
+  Information about who reported the issue.
+</ResponseField>
+
+<ResponseField name="priority" type="string | null" required>
+  Priority level of the issue.
+</ResponseField>
+
+<ResponseField name="severity" type="string | null" required>
+  Severity level of the issue.
+</ResponseField>
+
+<ResponseField name="description" type="string | null" required>
+  Description of the issue.
+</ResponseField>
+
+<ResponseField name="status" type="string | null" required>
+  Current status of the issue (e.g., "open", "resolved", "closed").
+</ResponseField>
+
+<ResponseField name="tool" type="AnnotationIssueTool | null" required>
+  Tool used for the annotation.
+</ResponseField>
+
+<ResponseField name="problem" type="AnnotationIssueProblem | null" required>
+  Type of problem identified.
+</ResponseField>
+
+<ResponseField name="wrongClass" type="string | null" required>
+  The incorrect class label, if applicable.
+</ResponseField>
+
+<ResponseField name="correctClass" type="string | null" required>
+  The correct class label, if applicable.
+</ResponseField>
+
+<ResponseField name="shouldReAnnotate" type="boolean | null" required>
+  Whether the item should be re-annotated.
+</ResponseField>
+
+<ResponseField name="shouldDelete" type="boolean | null" required>
+  Whether the annotation should be deleted.
+</ResponseField>
+
+<ResponseField name="framesAffected" type="string | null" required>
+  Frames affected by the issue (for video/sequences).
+</ResponseField>
+
+<ResponseField name="coordinates" type="unknown" required>
+  Coordinates of the issue location.
+</ResponseField>
+
+<ResponseField name="queryParams" type="Record<string, unknown> | null" required>
+  Query parameters for navigating to the issue.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the issue was created.
+</ResponseField>
+
+<ResponseField name="closedAt" type="string | null" required>
+  ISO 8601 timestamp of when the issue was closed.
+</ResponseField>
+
+<ResponseField name="objectUid" type="string | null" required>
+  UID of the annotation object with the issue.
+</ResponseField>
+
+### AnnotationIssueProject
+
+<ResponseField name="uid" type="string" required>
+  Project UID.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Project name.
+</ResponseField>
+
+### AnnotationIssueReporter
+
+<ResponseField name="username" type="string" required>
+  Username of the reporter.
+</ResponseField>
+
+<ResponseField name="picture" type="string | null" required>
+  Profile picture URL of the reporter.
+</ResponseField>
+
+<ResponseField name="fullName" type="string | null" required>
+  Full name of the reporter.
+</ResponseField>
+
+<ResponseField name="type" type="string | null" required>
+  Type of reporter (e.g., "human", "agent").
+</ResponseField>
+
+<ResponseField name="isStaff" type="boolean | null" required>
+  Whether the reporter is a staff member.
+</ResponseField>
+
+### AnnotationIssueTool
+
+<ResponseField name="uid" type="string" required>
+  Tool UID.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Tool name.
+</ResponseField>
+
+<ResponseField name="default" type="boolean | null" required>
+  Whether this is the default tool.
+</ResponseField>
+
+### AnnotationIssueProblem
+
+<ResponseField name="uid" type="string" required>
+  Problem UID.
+</ResponseField>
+
+<ResponseField name="title" type="string" required>
+  Problem title.
+</ResponseField>
+
+### AnnotationIssueMetrics
+
+Metrics for annotation issues.
+
+<ResponseField name="statusCount" type="Record<string, number> | null" required>
+  Count of issues by status.
+</ResponseField>
+
+<ResponseField name="priorityCount" type="Record<string, number> | null" required>
+  Count of issues by priority.
+</ResponseField>
+
+<ResponseField name="severityCount" type="Record<string, number> | null" required>
+  Count of issues by severity.
+</ResponseField>
+
+<ResponseField name="meanSecondsCloseTimeAll" type="number | null" required>
+  Mean time to close issues (in seconds) for all reporters.
+</ResponseField>
+
+<ResponseField name="meanSecondsCloseTimeCustomer" type="number | null" required>
+  Mean time to close issues (in seconds) for customer reporters.
+</ResponseField>
+
+<ResponseField name="meanUnresolvedIssueAgeAll" type="number | null" required>
+  Mean age of unresolved issues (in seconds) for all reporters.
+</ResponseField>
+
+<ResponseField name="meanUnresolvedIssueAgeCustomer" type="number | null" required>
+  Mean age of unresolved issues (in seconds) for customer reporters.
+</ResponseField>
+
+<ResponseField name="objectCountByAnnotationIssueProblemUid" type="Record<string, unknown>[] | null" required>
+  Count of issues by problem type.
+</ResponseField>
+
+### AnnotationIssueToolDetail
+
+Detailed information about an annotation issue tool.
+
+<ResponseField name="uid" type="string" required>
+  Tool UID.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Tool name.
+</ResponseField>
+
+<ResponseField name="datasetType" type="string | null" required>
+  Type of dataset this tool is for.
+</ResponseField>
+
+<ResponseField name="default" type="boolean | null" required>
+  Whether this is the default tool.
+</ResponseField>
+
+<ResponseField name="problems" type="AnnotationIssueProblem[] | null" required>
+  Array of problems that can be reported with this tool.
+</ResponseField>
+
+## Fleet management types
+
+### FleetDevice
+
+Represents a device in a fleet.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the device.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Display name of the device.
+</ResponseField>
+
+<ResponseField name="type" type="string | null" required>
+  Type of device (e.g., "sensor", "camera", "lidar").
+</ResponseField>
+
+<ResponseField name="status" type="string | null" required>
+  Current status of the device (e.g., "online", "offline", "error").
+</ResponseField>
+
+<ResponseField name="tags" type="string[]" required>
+  Array of tags for organizing devices.
+</ResponseField>
+
+<ResponseField name="firmwareVersion" type="string | null" required>
+  Current firmware version.
+</ResponseField>
+
+<ResponseField name="metadata" type="Record<string, unknown> | null" required>
+  Additional metadata about the device.
+</ResponseField>
+
+<ResponseField name="lastSeenAt" type="string | null" required>
+  ISO 8601 timestamp of when the device was last seen.
+</ResponseField>
+
+<ResponseField name="deviceToken" type="string | null" required>
+  Authentication token for the device.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the device was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the device was last updated.
+</ResponseField>
+
+### FleetRecording
+
+Represents a recording from a fleet device.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the recording.
+</ResponseField>
+
+<ResponseField name="device" type="string | null" required>
+  UID of the device that made the recording.
+</ResponseField>
+
+<ResponseField name="status" type="string | null" required>
+  Current status of the recording (e.g., "recording", "processing", "completed").
+</ResponseField>
+
+<ResponseField name="durationSeconds" type="number | null" required>
+  Duration of the recording in seconds.
+</ResponseField>
+
+<ResponseField name="sizeBytes" type="number | null" required>
+  Size of the recording in bytes.
+</ResponseField>
+
+<ResponseField name="topicCount" type="number" required>
+  Number of topics/channels in the recording.
+</ResponseField>
+
+<ResponseField name="tags" type="string[]" required>
+  Array of tags for organizing recordings.
+</ResponseField>
+
+<ResponseField name="topics" type="Array<Record<string, unknown>> | null" required>
+  Array of topics/channels included in the recording.
+</ResponseField>
+
+<ResponseField name="startedAt" type="string | null" required>
+  ISO 8601 timestamp of when the recording started.
+</ResponseField>
+
+<ResponseField name="endedAt" type="string | null" required>
+  ISO 8601 timestamp of when the recording ended.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the recording was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the recording was last updated.
+</ResponseField>
+
+### FleetEvent
+
+Represents an event that occurred on a fleet device or recording.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the event.
+</ResponseField>
+
+<ResponseField name="recording" type="string | null" required>
+  UID of the recording where the event occurred.
+</ResponseField>
+
+<ResponseField name="device" type="string | null" required>
+  UID of the device where the event occurred.
+</ResponseField>
+
+<ResponseField name="type" type="string | null" required>
+  Type of event (e.g., "error", "warning", "info").
+</ResponseField>
+
+<ResponseField name="label" type="string | null" required>
+  Label or category for the event.
+</ResponseField>
+
+<ResponseField name="description" type="string | null" required>
+  Description of the event.
+</ResponseField>
+
+<ResponseField name="timestamp" type="string | null" required>
+  ISO 8601 timestamp of when the event occurred.
+</ResponseField>
+
+<ResponseField name="durationMs" type="number | null" required>
+  Duration of the event in milliseconds.
+</ResponseField>
+
+<ResponseField name="tags" type="string[]" required>
+  Array of tags for organizing events.
+</ResponseField>
+
+<ResponseField name="metadata" type="Record<string, unknown> | null" required>
+  Additional metadata about the event.
+</ResponseField>
+
+<ResponseField name="severity" type="string | null" required>
+  Severity level of the event.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the event was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the event was last updated.
+</ResponseField>
+
+### FleetRule
+
+Represents an automation rule for fleet management.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the rule.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Display name of the rule.
+</ResponseField>
+
+<ResponseField name="description" type="string | null" required>
+  Description of what the rule does.
+</ResponseField>
+
+<ResponseField name="enabled" type="boolean" required>
+  Whether the rule is currently enabled.
+</ResponseField>
+
+<ResponseField name="condition" type="Record<string, unknown> | null" required>
+  Condition that triggers the rule.
+</ResponseField>
+
+<ResponseField name="actions" type="Array<Record<string, unknown>>" required>
+  Array of actions to take when the rule is triggered.
+</ResponseField>
+
+<ResponseField name="scope" type="Record<string, unknown> | null" required>
+  Scope where the rule applies (e.g., specific devices or recordings).
+</ResponseField>
+
+<ResponseField name="hitCount" type="number" required>
+  Number of times the rule has been triggered.
+</ResponseField>
+
+<ResponseField name="lastHitAt" type="string | null" required>
+  ISO 8601 timestamp of when the rule was last triggered.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the rule was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the rule was last updated.
+</ResponseField>
+
+### FleetAlert
+
+Represents an alert generated by a fleet rule.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the alert.
+</ResponseField>
+
+<ResponseField name="rule" type="string | null" required>
+  UID of the rule that generated the alert.
+</ResponseField>
+
+<ResponseField name="device" type="string | null" required>
+  UID of the device related to the alert.
+</ResponseField>
+
+<ResponseField name="recording" type="string | null" required>
+  UID of the recording related to the alert.
+</ResponseField>
+
+<ResponseField name="severity" type="string | null" required>
+  Severity level of the alert.
+</ResponseField>
+
+<ResponseField name="status" type="string | null" required>
+  Current status of the alert (e.g., "active", "acknowledged", "resolved").
+</ResponseField>
+
+<ResponseField name="message" type="string | null" required>
+  Alert message.
+</ResponseField>
+
+<ResponseField name="triggeredAt" type="string | null" required>
+  ISO 8601 timestamp of when the alert was triggered.
+</ResponseField>
+
+<ResponseField name="acknowledgedAt" type="string | null" required>
+  ISO 8601 timestamp of when the alert was acknowledged.
+</ResponseField>
+
+<ResponseField name="acknowledgedBy" type="string | null" required>
+  UID of the user who acknowledged the alert.
+</ResponseField>
+
+<ResponseField name="resolvedAt" type="string | null" required>
+  ISO 8601 timestamp of when the alert was resolved.
+</ResponseField>
+
+<ResponseField name="resolutionNote" type="string | null" required>
+  Note about how the alert was resolved.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the alert was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the alert was last updated.
+</ResponseField>
+
+### FleetAlertChannel
+
+Represents a channel for sending fleet alerts.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the alert channel.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Display name of the channel.
+</ResponseField>
+
+<ResponseField name="type" type="string | null" required>
+  Type of channel (e.g., "email", "webhook", "slack").
+</ResponseField>
+
+<ResponseField name="config" type="Record<string, unknown> | null" required>
+  Configuration for the channel.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the channel was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the channel was last updated.
+</ResponseField>
+
+## Webhook types
+
+### Webhook
+
+Represents a webhook subscription.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the webhook.
+</ResponseField>
+
+<ResponseField name="targetUrl" type="string" required>
+  URL where webhook events will be sent.
+</ResponseField>
+
+<ResponseField name="events" type="string[]" required>
+  Array of event types this webhook subscribes to.
+</ResponseField>
+
+<ResponseField name="isActive" type="boolean" required>
+  Whether the webhook is currently active.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the webhook was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the webhook was last updated.
+</ResponseField>
+
+### WebhookDelivery
+
+Represents a webhook delivery attempt.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the delivery.
+</ResponseField>
+
+<ResponseField name="subscription" type="string" required>
+  UID of the webhook subscription.
+</ResponseField>
+
+<ResponseField name="eventType" type="string" required>
+  Type of event that was delivered.
+</ResponseField>
+
+<ResponseField name="payload" type="Record<string, unknown>" required>
+  Payload that was sent.
+</ResponseField>
+
+<ResponseField name="responseStatus" type="number | null" required>
+  HTTP status code of the response.
+</ResponseField>
+
+<ResponseField name="responseBody" type="string | null" required>
+  Response body from the webhook endpoint.
+</ResponseField>
+
+<ResponseField name="attempts" type="number" required>
+  Number of delivery attempts.
+</ResponseField>
+
+<ResponseField name="nextRetryAt" type="string | null" required>
+  ISO 8601 timestamp of when the next retry will occur.
+</ResponseField>
+
+<ResponseField name="status" type="string | null" required>
+  Current status of the delivery (e.g., "pending", "delivered", "failed").
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the delivery was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the delivery was last updated.
+</ResponseField>
+
+## Organization and team types
+
+### Organization
+
+Represents an organization.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the organization.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Display name of the organization.
+</ResponseField>
+
+<ResponseField name="slug" type="string" required>
+  URL-friendly identifier for the organization.
+</ResponseField>
+
+<ResponseField name="handle" type="string | null" required>
+  Handle or username for the organization.
+</ResponseField>
+
+<ResponseField name="description" type="string | null" required>
+  Description of the organization.
+</ResponseField>
+
+<ResponseField name="logo" type="string | null" required>
+  URL of the organization's logo.
+</ResponseField>
+
+<ResponseField name="website" type="string | null" required>
+  Organization's website URL.
+</ResponseField>
+
+<ResponseField name="industry" type="string | null" required>
+  Industry the organization operates in.
+</ResponseField>
+
+<ResponseField name="email" type="string | null" required>
+  Contact email for the organization.
+</ResponseField>
+
+<ResponseField name="phone" type="string | null" required>
+  Contact phone number for the organization.
+</ResponseField>
+
+<ResponseField name="visibility" type="string | null" required>
+  Visibility setting (e.g., "private", "public").
+</ResponseField>
+
+<ResponseField name="plan" type="string | null" required>
+  Billing plan for the organization.
+</ResponseField>
+
+<ResponseField name="isVerified" type="boolean" required>
+  Whether the organization is verified.
+</ResponseField>
+
+<ResponseField name="isActive" type="boolean" required>
+  Whether the organization is currently active.
+</ResponseField>
+
+<ResponseField name="memberCount" type="number | null" required>
+  Number of members in the organization.
+</ResponseField>
+
+<ResponseField name="teamCount" type="number | null" required>
+  Number of teams in the organization.
+</ResponseField>
+
+<ResponseField name="datasetCount" type="number | null" required>
+  Number of datasets owned by the organization.
+</ResponseField>
+
+<ResponseField name="projectCount" type="number | null" required>
+  Number of projects owned by the organization.
+</ResponseField>
+
+<ResponseField name="sliceCount" type="number | null" required>
+  Number of slices owned by the organization.
+</ResponseField>
+
+<ResponseField name="role" type="string | null" required>
+  Current user's role in the organization.
+</ResponseField>
+
+<ResponseField name="joinedAt" type="string | null" required>
+  ISO 8601 timestamp of when the current user joined.
+</ResponseField>
+
+<ResponseField name="allowedDomains" type="string[] | null" required>
+  Array of email domains allowed for auto-joining.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the organization was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the organization was last updated.
+</ResponseField>
+
+### OrganizationMember
+
+Represents a member of an organization.
+
+<ResponseField name="userUid" type="string" required>
+  UID of the user.
+</ResponseField>
+
+<ResponseField name="username" type="string | null" required>
+  Username of the member.
+</ResponseField>
+
+<ResponseField name="email" type="string | null" required>
+  Email address of the member.
+</ResponseField>
+
+<ResponseField name="fullName" type="string | null" required>
+  Full name of the member.
+</ResponseField>
+
+<ResponseField name="picture" type="string | null" required>
+  Profile picture URL of the member.
+</ResponseField>
+
+<ResponseField name="role" type="string | null" required>
+  Role of the member in the organization.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the member joined.
+</ResponseField>
+
+### Invitation
+
+Represents an invitation to join an organization.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the invitation.
+</ResponseField>
+
+<ResponseField name="organizationName" type="string | null" required>
+  Name of the organization.
+</ResponseField>
+
+<ResponseField name="organizationSlug" type="string | null" required>
+  Slug of the organization.
+</ResponseField>
+
+<ResponseField name="invitedEmail" type="string" required>
+  Email address of the invitee.
+</ResponseField>
+
+<ResponseField name="invitedByUsername" type="string | null" required>
+  Username of the person who sent the invitation.
+</ResponseField>
+
+<ResponseField name="role" type="string | null" required>
+  Role the invitee will have.
+</ResponseField>
+
+<ResponseField name="status" type="string | null" required>
+  Current status of the invitation (e.g., "pending", "accepted", "expired").
+</ResponseField>
+
+<ResponseField name="expiresAt" type="string | null" required>
+  ISO 8601 timestamp of when the invitation expires.
+</ResponseField>
+
+<ResponseField name="isExpired" type="boolean | null" required>
+  Whether the invitation is expired.
+</ResponseField>
+
+<ResponseField name="acceptUrl" type="string | null" required>
+  URL to accept the invitation.
+</ResponseField>
+
+<ResponseField name="copyLink" type="string | null" required>
+  Shareable link for the invitation.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the invitation was created.
+</ResponseField>
+
+### Team
+
+Represents a team within an organization.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the team.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Display name of the team.
+</ResponseField>
+
+<ResponseField name="slug" type="string | null" required>
+  URL-friendly identifier for the team.
+</ResponseField>
+
+<ResponseField name="description" type="string | null" required>
+  Description of the team.
+</ResponseField>
+
+<ResponseField name="color" type="string | null" required>
+  Color code for the team (for UI purposes).
+</ResponseField>
+
+<ResponseField name="organizationUid" type="string | null" required>
+  UID of the organization this team belongs to.
+</ResponseField>
+
+<ResponseField name="organizationName" type="string | null" required>
+  Name of the organization this team belongs to.
+</ResponseField>
+
+<ResponseField name="organizationSlug" type="string | null" required>
+  Slug of the organization this team belongs to.
+</ResponseField>
+
+<ResponseField name="memberCount" type="number | null" required>
+  Number of members in the team.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the team was created.
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null" required>
+  ISO 8601 timestamp of when the team was last updated.
+</ResponseField>
+
+### TeamMember
+
+Represents a member of a team.
+
+<ResponseField name="userUid" type="string" required>
+  UID of the user.
+</ResponseField>
+
+<ResponseField name="username" type="string | null" required>
+  Username of the member.
+</ResponseField>
+
+<ResponseField name="email" type="string | null" required>
+  Email address of the member.
+</ResponseField>
+
+<ResponseField name="fullName" type="string | null" required>
+  Full name of the member.
+</ResponseField>
+
+<ResponseField name="picture" type="string | null" required>
+  Profile picture URL of the member.
+</ResponseField>
+
+<ResponseField name="role" type="string | null" required>
+  Role of the member in the team.
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null" required>
+  ISO 8601 timestamp of when the member joined the team.
+</ResponseField>
+
+## Slice types
+
+### Slice
+
+Represents a slice (filtered view) of a dataset.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the slice.
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Display name of the slice.
+</ResponseField>
+
+<ResponseField name="slug" type="string | null" required>
+  URL-friendly identifier for the slice.
+</ResponseField>
+
+<ResponseField name="ownerName" type="string | null" required>
+  Name of the owner.
+</ResponseField>
+
+<ResponseField name="organization" type="Record<string, unknown> | null" required>
+  Organization information.
+</ResponseField>
+
+<ResponseField name="visibility" type="string | null" required>
+  Visibility setting (e.g., "private", "public").
+</ResponseField>
+
+<ResponseField name="status" type="string | null" required>
+  Current status of the slice.
+</ResponseField>
+
+<ResponseField name="itemCount" type="number | null" required>
+  Number of items in the slice.
+</ResponseField>
+
+<ResponseField name="subSlices" type="Record<string, unknown>[] | null" required>
+  Array of sub-slices.
+</ResponseField>
+
+<ResponseField name="sourceData" type="unknown | null" required>
+  Source data configuration.
+</ResponseField>
+
+<ResponseField name="featuredSliceItemUrls" type="string[] | null" required>
+  Array of URLs for featured items in the slice.
+</ResponseField>
+
+## Authentication and signup types
+
+### SignupUser
+
+User information returned after signup.
+
+<ResponseField name="uid" type="string" required>
+  Unique identifier for the user.
+</ResponseField>
+
+<ResponseField name="username" type="string" required>
+  Username chosen by the user.
+</ResponseField>
+
+<ResponseField name="email" type="string | null" required>
+  Email address of the user.
+</ResponseField>
+
+<ResponseField name="firstName" type="string | null" required>
+  First name of the user.
+</ResponseField>
+
+<ResponseField name="lastName" type="string | null" required>
+  Last name of the user.
+</ResponseField>
+
+<ResponseField name="inWaitlist" type="boolean" required>
+  Whether the user is in the waitlist.
+</ResponseField>
+
+### SignupResponse
+
+Response from the signup endpoint.
+
+<ResponseField name="user" type="SignupUser" required>
+  Information about the newly created user.
+</ResponseField>
+
+<ResponseField name="apiKey" type="string" required>
+  API key for the new user.
+</ResponseField>
+
+## Pagination types
+
+### CursorPage
+
+Generic cursor-based pagination response.
+
+<ResponseField name="items" type="T[]" required>
+  Array of items in the current page.
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null" required>
+  Cursor for the next page, or null if this is the last page.
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null" required>
+  Cursor for the previous page, or null if this is the first page.
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean" required>
+  Whether there are more items after the current page.
+</ResponseField>
+
+### RawPageResponse
+
+Raw API response shape from DRF cursor pagination.
+
+<ResponseField name="results" type="Record<string, unknown>[]" required>
+  Array of raw result objects.
+</ResponseField>
+
+<ResponseField name="next" type="string | null" required>
+  URL for the next page.
+</ResponseField>
+
+<ResponseField name="previous" type="string | null" required>
+  URL for the previous page.
+</ResponseField>
+
+## Rate limiting types
+
+### RateLimitInfo
+
+Information about rate limiting.
+
+<ResponseField name="limit" type="string | null" required>
+  Total rate limit.
+</ResponseField>
+
+<ResponseField name="remaining" type="string | null" required>
+  Remaining requests before hitting the limit.
+</ResponseField>
+
+<ResponseField name="reset" type="string | null" required>
+  ISO 8601 timestamp of when the rate limit resets.
+</ResponseField>

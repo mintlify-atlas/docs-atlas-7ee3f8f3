@@ -1,0 +1,375 @@
+---
+title: Rate limits
+description: Monitor and handle API rate limits to ensure reliable application performance
+---
+
+The Avala API enforces rate limits to ensure fair usage and system stability. The SDK provides tools to monitor rate limit status and handle rate limit errors.
+
+## Rate limit headers
+
+Every API response includes rate limit information in the headers:
+
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | Maximum number of requests allowed in the time window |
+| `X-RateLimit-Remaining` | Number of requests remaining in the current window |
+| `X-RateLimit-Reset` | Timestamp when the rate limit window resets |
+
+## Checking rate limit status
+
+Access current rate limit information after any request:
+
+```typescript
+const datasets = await avala.datasets.list();
+
+// Get rate limit info from the last request
+const rateLimit = avala.rateLimitInfo;
+
+console.log('Limit:', rateLimit.limit);
+console.log('Remaining:', rateLimit.remaining);
+console.log('Reset:', rateLimit.reset);
+```
+
+### RateLimitInfo interface
+
+The rate limit information is typed:
+
+```typescript types.ts:59-63
+export interface RateLimitInfo {
+  limit: string | null;
+  remaining: string | null;
+  reset: string | null;
+}
+```
+
+<Note>
+Rate limit values are returned as strings from the API headers. Convert them to numbers for calculations.
+</Note>
+
+## Monitoring rate limits
+
+Implement proactive monitoring to avoid hitting limits:
+
+<CodeGroup>
+```typescript Basic monitoring
+async function monitoredRequest() {
+  const datasets = await avala.datasets.list();
+  
+  const rateLimit = avala.rateLimitInfo;
+  const remaining = parseInt(rateLimit.remaining || '0');
+  const limit = parseInt(rateLimit.limit || '0');
+  
+  if (remaining < limit * 0.1) {
+    console.warn('Rate limit nearly exhausted!');
+    console.warn(`${remaining}/${limit} requests remaining`);
+  }
+  
+  return datasets;
+}
+```
+
+```typescript With throttling
+class RateLimitedClient {
+  private avala: Avala;
+  private minRemaining = 10;
+  
+  constructor(apiKey: string) {
+    this.avala = new Avala({ apiKey });
+  }
+  
+  async safeRequest<T>(fn: () => Promise<T>): Promise<T> {
+    // Check before making request
+    const info = this.avala.rateLimitInfo;
+    const remaining = parseInt(info.remaining || '0');
+    
+    if (remaining > 0 && remaining < this.minRemaining) {
+      const reset = parseInt(info.reset || '0');
+      const waitTime = reset - Date.now();
+      
+      console.log(`Waiting ${waitTime}ms for rate limit reset`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+    
+    return await fn();
+  }
+}
+
+const client = new RateLimitedClient('your-api-key');
+const datasets = await client.safeRequest(
+  () => client.avala.datasets.list()
+);
+```
+</CodeGroup>
+
+## Handling rate limit errors
+
+When you exceed the rate limit, the API returns a 429 status code:
+
+```typescript
+import { RateLimitError } from '@avala/sdk';
+
+try {
+  const datasets = await avala.datasets.list();
+} catch (error) {
+  if (error instanceof RateLimitError) {
+    console.error('Rate limit exceeded');
+    console.error('Retry after:', error.retryAfter, 'seconds');
+  }
+}
+```
+
+### RateLimitError properties
+
+The error includes retry timing information:
+
+```typescript errors.ts:27-35
+export class RateLimitError extends AvalaError {
+  public readonly retryAfter: number | null;
+
+  constructor(message: string, body?: unknown, retryAfter?: number | null) {
+    super(message, 429, body);
+    this.name = "RateLimitError";
+    this.retryAfter = retryAfter ?? null;
+  }
+}
+```
+
+<Warning>
+The `retryAfter` property may be `null` if the server doesn't provide a `Retry-After` header.
+</Warning>
+
+## Implementing retry logic
+
+<Steps>
+<Step title="Detect rate limit errors">
+  Check for `RateLimitError` when making requests:
+
+  ```typescript
+  import { RateLimitError } from '@avala/sdk';
+
+  try {
+    return await avala.datasets.list();
+  } catch (error) {
+    if (error instanceof RateLimitError) {
+      // Handle rate limit
+    }
+    throw error;
+  }
+  ```
+</Step>
+
+<Step title="Calculate wait time">
+  Use `retryAfter` or calculate from `reset` timestamp:
+
+  ```typescript
+  if (error instanceof RateLimitError) {
+    let waitTime: number;
+    
+    if (error.retryAfter) {
+      // Use Retry-After header
+      waitTime = error.retryAfter * 1000;
+    } else {
+      // Calculate from rate limit reset
+      const info = avala.rateLimitInfo;
+      const reset = parseInt(info.reset || '0');
+      waitTime = reset - Date.now();
+    }
+    
+    console.log(`Waiting ${waitTime}ms before retry`);
+  }
+  ```
+</Step>
+
+<Step title="Wait and retry">
+  Implement exponential backoff for reliability:
+
+  ```typescript
+  async function withRetry<T>(
+    fn: () => Promise<T>,
+    maxRetries = 3
+  ): Promise<T> {
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        return await fn();
+      } catch (error) {
+        if (error instanceof RateLimitError) {
+          if (i === maxRetries - 1) throw error;
+          
+          const waitTime = error.retryAfter
+            ? error.retryAfter * 1000
+            : Math.pow(2, i) * 1000; // Exponential backoff
+          
+          console.log(`Retry ${i + 1}/${maxRetries} after ${waitTime}ms`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          continue;
+        }
+        throw error;
+      }
+    }
+    throw new Error('Max retries exceeded');
+  }
+
+  const datasets = await withRetry(() => avala.datasets.list());
+  ```
+</Step>
+</Steps>
+
+## Rate limit extraction
+
+The SDK automatically extracts rate limit headers from every response:
+
+```typescript http.ts:61-68
+private extractRateLimitHeaders(response: Response): void {
+  if (!response.headers) return;
+  this._lastRateLimit = {
+    limit: response.headers.get("X-RateLimit-Limit"),
+    remaining: response.headers.get("X-RateLimit-Remaining"),
+    reset: response.headers.get("X-RateLimit-Reset"),
+  };
+}
+```
+
+This happens automatically during the request lifecycle:
+
+```typescript http.ts:88
+this.extractRateLimitHeaders(response);
+```
+
+## Best practices
+
+<Steps>
+<Step title="Monitor proactively">
+  Check rate limit status before making requests:
+
+  ```typescript
+  async function smartRequest() {
+    const info = avala.rateLimitInfo;
+    const remaining = parseInt(info.remaining || '100');
+    
+    if (remaining < 5) {
+      console.warn('Rate limit running low, consider delaying');
+    }
+    
+    return await avala.datasets.list();
+  }
+  ```
+</Step>
+
+<Step title="Implement backoff strategies">
+  Use exponential backoff for retries:
+
+  ```typescript
+  async function exponentialBackoff<T>(
+    fn: () => Promise<T>,
+    maxRetries = 5
+  ): Promise<T> {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        return await fn();
+      } catch (error) {
+        if (error instanceof RateLimitError && attempt < maxRetries - 1) {
+          const delay = Math.min(
+            Math.pow(2, attempt) * 1000,
+            60000 // Max 60 seconds
+          );
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        throw error;
+      }
+    }
+    throw new Error('All retries exhausted');
+  }
+  ```
+</Step>
+
+<Step title="Batch requests efficiently">
+  Group operations to reduce API calls:
+
+  ```typescript
+  // Good: Batch process
+  async function processDatasets(uids: string[]) {
+    const results = [];
+    
+    for (const uid of uids) {
+      const dataset = await avala.datasets.get(uid);
+      results.push(dataset);
+      
+      // Add small delay between requests
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    return results;
+  }
+
+  // Better: Use pagination when possible
+  async function getAllDatasets() {
+    let cursor: string | null = null;
+    const datasets = [];
+    
+    do {
+      const page = await avala.datasets.list({ cursor });
+      datasets.push(...page.items);
+      cursor = page.nextCursor;
+    } while (cursor !== null);
+    
+    return datasets;
+  }
+  ```
+</Step>
+
+<Step title="Cache responses">
+  Reduce API calls by caching data:
+
+  ```typescript
+  class CachedClient {
+    private cache = new Map<string, { data: any; expiry: number }>();
+    private avala: Avala;
+    
+    constructor(apiKey: string) {
+      this.avala = new Avala({ apiKey });
+    }
+    
+    async getDataset(uid: string) {
+      const cached = this.cache.get(uid);
+      
+      if (cached && cached.expiry > Date.now()) {
+        return cached.data;
+      }
+      
+      const dataset = await this.avala.datasets.get(uid);
+      
+      this.cache.set(uid, {
+        data: dataset,
+        expiry: Date.now() + 60000 // Cache for 1 minute
+      });
+      
+      return dataset;
+    }
+  }
+  ```
+</Step>
+</Steps>
+
+<Tip>
+Combine rate limit monitoring with caching and batching for the most efficient API usage.
+</Tip>
+
+## Understanding reset times
+
+The `reset` timestamp indicates when the rate limit window resets:
+
+```typescript
+const info = avala.rateLimitInfo;
+const resetTime = parseInt(info.reset || '0');
+const now = Date.now();
+
+if (resetTime > now) {
+  const secondsUntilReset = Math.ceil((resetTime - now) / 1000);
+  console.log(`Rate limit resets in ${secondsUntilReset} seconds`);
+}
+```
+
+<Note>
+The `reset` timestamp is in milliseconds since Unix epoch. Convert it to a Date object for display: `new Date(parseInt(info.reset || '0'))`.
+</Note>

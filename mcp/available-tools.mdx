@@ -1,0 +1,515 @@
+---
+title: Available tools
+description: Complete reference of all tools provided by the Avala MCP server
+---
+
+The Avala MCP server provides tools for managing all aspects of your workspace. Tools are organized by category and availability depends on whether mutations are enabled.
+
+<Note>
+Tools marked with **Write** require `AVALA_MCP_ENABLE_MUTATIONS=true`. All other tools are available in read-only mode.
+</Note>
+
+## Datasets
+
+Manage annotation datasets and their configurations.
+
+### list_datasets
+
+List all datasets in your workspace with filtering options.
+
+**Parameters**:
+- `dataType` (optional) - Filter by type: `image`, `video`, `lidar`, `mcap`, or `splat`
+- `name` (optional) - Filter by name (substring match, case-insensitive)
+- `status` (optional) - Filter by status: `creating` or `created`
+- `visibility` (optional) - Filter by visibility: `private` or `public`
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### get_dataset
+
+Get detailed information about a specific dataset.
+
+**Parameters**:
+- `uid` (required) - Dataset UUID
+
+### create_dataset **Write**
+
+Create a new dataset for annotation.
+
+**Parameters**:
+- `name` (required) - Display name for the dataset
+- `slug` (required) - URL-friendly identifier
+- `dataType` (required) - Type: `image`, `video`, `lidar`, or `mcap`
+- `isSequence` (optional) - Whether dataset contains sequences (default: false)
+- `visibility` (optional) - `private` or `public` (default: private)
+- `createMetadata` (optional) - Whether to create metadata (default: true)
+- `providerConfig` (optional) - Cloud storage configuration
+- `ownerName` (optional) - Owner username or email
+
+## Projects
+
+Access annotation project details and status.
+
+### list_projects
+
+List all annotation projects with status and progress.
+
+**Parameters**:
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### get_project
+
+Get full project details including configuration.
+
+**Parameters**:
+- `uid` (required) - Project UUID
+
+## Tasks
+
+Query and filter annotation tasks.
+
+### list_tasks
+
+List tasks with optional filtering.
+
+**Parameters**:
+- `project` (optional) - Filter by project UID
+- `status` (optional) - Filter by task status
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### get_task
+
+Get detailed information about a specific task.
+
+**Parameters**:
+- `uid` (required) - Task UUID
+
+## Statistics
+
+Access workspace-wide statistics and metrics.
+
+### get_workspace_stats
+
+Get summary of workspace usage including dataset, project, and export counts.
+
+**Parameters**: None
+
+## Agents
+
+Manage automation agents for event-driven workflows.
+
+### list_agents
+
+List all automation agents in your workspace.
+
+**Parameters**:
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### get_agent
+
+Get detailed information about a specific agent.
+
+**Parameters**:
+- `uid` (required) - Agent UUID
+
+### create_agent **Write**
+
+Create a new automation agent.
+
+**Parameters**:
+- `name` (required) - Name of the agent
+- `events` (required) - Array of event types to subscribe to
+- `callbackUrl` (optional) - URL to receive event callbacks
+- `description` (optional) - Description of the agent
+- `project` (optional) - Project UID to scope the agent
+- `taskTypes` (optional) - Array of task types the agent handles
+
+### delete_agent **Write**
+
+Delete an automation agent.
+
+**Parameters**:
+- `uid` (required) - Agent UUID to delete
+
+## Annotation issues
+
+Manage quality control issues and QC tools.
+
+### list_annotation_issues_by_sequence
+
+List annotation issues for a specific sequence.
+
+**Parameters**:
+- `sequenceUid` (required) - Sequence UID
+- `datasetItemUid` (optional) - Filter by dataset item
+- `projectUid` (optional) - Filter by project
+
+### list_annotation_issues_by_dataset
+
+List annotation issues for a dataset.
+
+**Parameters**:
+- `owner` (required) - Dataset owner
+- `datasetSlug` (required) - Dataset slug
+- `sequenceUid` (optional) - Filter by sequence
+
+### get_annotation_issue_metrics
+
+Get annotation issue metrics for a dataset.
+
+**Parameters**:
+- `owner` (required) - Dataset owner
+- `datasetSlug` (required) - Dataset slug
+- `sequenceUid` (optional) - Filter by sequence
+
+### list_qc_tools
+
+List available QC annotation tools for a dataset type.
+
+**Parameters**:
+- `datasetType` (required) - Dataset type: `image`, `video`, or `lidar`
+
+### create_annotation_issue **Write**
+
+Create a new annotation issue on a sequence.
+
+**Parameters**:
+- `sequenceUid` (required) - Sequence UID
+- `toolUid` (required) - Annotation tool UID
+- `problemUid` (required) - Issue problem UID
+- `datasetItemUid` (optional) - Dataset item UID
+- `projectUid` (optional) - Project UID
+- `priority` (optional) - `lowest`, `low`, `medium`, `high`, or `highest`
+- `severity` (optional) - `critical` or `moderate`
+- `description` (optional) - Issue description
+- `wrongClass` (optional) - Incorrect class label
+- `correctClass` (optional) - Correct class label
+- `shouldReAnnotate` (optional) - Whether to re-annotate
+- `shouldDelete` (optional) - Whether to delete annotation
+- `framesAffected` (optional) - Frames affected by issue
+- `coordinates` (optional) - Issue coordinates
+- `queryParams` (optional) - Additional query parameters
+- `objectUid` (optional) - Annotation object UID
+
+### update_annotation_issue **Write**
+
+Update an existing annotation issue.
+
+**Parameters**:
+- `sequenceUid` (required) - Sequence UID
+- `issueUid` (required) - Issue UID
+- `status` (optional) - `open`, `relabeling`, `in_review`, `completed`, `cant_reproduce`, `awaiting_feedback`, or `no_action_taken`
+- `priority` (optional) - Issue priority
+- `severity` (optional) - Issue severity
+- `description` (optional) - Issue description
+- `toolUid` (optional) - Annotation tool UID
+- `problemUid` (optional) - Issue problem UID
+- `wrongClass` (optional) - Incorrect class
+- `framesAffected` (optional) - Affected frames
+
+### delete_annotation_issue **Write**
+
+Delete an annotation issue.
+
+**Parameters**:
+- `sequenceUid` (required) - Sequence UID
+- `issueUid` (required) - Issue UID to delete
+
+## Quality targets
+
+Manage quality targets and evaluation.
+
+### list_quality_targets
+
+List quality targets configured for a project.
+
+**Parameters**:
+- `projectUid` (required) - Project UUID
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### evaluate_quality **Write**
+
+Evaluate all quality targets for a project.
+
+**Parameters**:
+- `projectUid` (required) - Project UUID to evaluate
+
+## Consensus
+
+Access consensus scores and trigger computation.
+
+### get_consensus_summary
+
+Get consensus summary including mean/median scores and distribution.
+
+**Parameters**:
+- `projectUid` (required) - Project UUID
+
+### compute_consensus **Write**
+
+Trigger consensus computation for a project.
+
+**Parameters**:
+- `projectUid` (required) - Project UUID
+
+## Webhooks
+
+Manage webhook subscriptions for event notifications.
+
+### list_webhooks
+
+List all webhook subscriptions.
+
+**Parameters**:
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### create_webhook **Write**
+
+Create a new webhook subscription.
+
+**Parameters**:
+- `targetUrl` (required) - URL to receive deliveries
+- `events` (required) - Array of event types to subscribe to
+
+### delete_webhook **Write**
+
+Delete a webhook subscription.
+
+**Parameters**:
+- `uid` (required) - Webhook UUID to delete
+
+## Storage configurations
+
+Manage cloud storage integrations.
+
+### list_storage_configs
+
+List all storage configurations.
+
+**Parameters**:
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### test_storage_config
+
+Test connectivity for a storage configuration.
+
+**Parameters**:
+- `uid` (required) - Storage config UUID to test
+
+### create_storage_config **Write**
+
+Create a new storage configuration (S3 or GCS).
+
+**Parameters**:
+- `name` (required) - Configuration name
+- `provider` (required) - Provider type: `s3` or `gcs`
+- `s3BucketName` (optional) - S3 bucket name
+- `s3BucketRegion` (optional) - S3 region
+- `s3BucketPrefix` (optional) - S3 key prefix
+- `s3AccessKeyId` (optional) - S3 access key ID
+- `s3SecretAccessKey` (optional) - S3 secret key
+- `s3IsAccelerated` (optional) - Enable S3 Transfer Acceleration
+- `gcStorageBucketName` (optional) - GCS bucket name
+- `gcStoragePrefix` (optional) - GCS prefix
+- `gcStorageAuthJsonContent` (optional) - GCS service account JSON
+
+<Note>
+Credentials are transmitted securely and stored server-side. The MCP server does not store credentials locally.
+</Note>
+
+### delete_storage_config **Write**
+
+Delete a storage configuration.
+
+**Parameters**:
+- `uid` (required) - Storage config UUID to delete
+
+## Exports
+
+Trigger and monitor data exports.
+
+### list_exports
+
+List all exports with formats and download URLs.
+
+**Parameters**:
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### get_export_status
+
+Check export processing status.
+
+**Parameters**:
+- `uid` (required) - Export UUID
+
+### create_export **Write**
+
+Trigger a new export for a dataset or project.
+
+**Parameters**:
+- `project` (optional) - Project UID to export
+- `dataset` (optional) - Dataset UID to export
+
+<Note>
+Provide either `project` or `dataset`, not both.
+</Note>
+
+## Organizations
+
+Access organization information and membership.
+
+### list_organizations
+
+List all organizations you are a member of.
+
+**Parameters**:
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### get_organization
+
+Get detailed organization information.
+
+**Parameters**:
+- `slug` (required) - Organization slug identifier
+
+## Slices
+
+Access dataset slices and filters.
+
+### list_slices
+
+List slices for an owner (user or organization).
+
+**Parameters**:
+- `owner` (required) - Owner name or organization slug
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### get_slice
+
+Get detailed information about a slice.
+
+**Parameters**:
+- `owner` (required) - Owner name or organization slug
+- `slug` (required) - Slice slug
+
+## Fleet management
+
+Monitor and manage IoT devices and data collection.
+
+### fleet_list_devices
+
+List fleet devices with filtering.
+
+**Parameters**:
+- `status` (optional) - Filter by status: `online`, `offline`, or `maintenance`
+- `type` (optional) - Filter by device type
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### fleet_get_device
+
+Get detailed device information.
+
+**Parameters**:
+- `uid` (required) - Device UUID
+
+### fleet_list_recordings
+
+List fleet recordings with filtering.
+
+**Parameters**:
+- `device` (optional) - Filter by device UID
+- `status` (optional) - Filter by recording status
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### fleet_get_recording
+
+Get detailed recording information.
+
+**Parameters**:
+- `uid` (required) - Recording UUID
+
+### fleet_list_events
+
+List fleet events with filtering.
+
+**Parameters**:
+- `recording` (optional) - Filter by recording UID
+- `device` (optional) - Filter by device UID
+- `type` (optional) - Filter by event type
+- `severity` (optional) - Filter by severity
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### fleet_list_alerts
+
+List fleet alerts with filtering.
+
+**Parameters**:
+- `status` (optional) - Filter by status: `open`, `acknowledged`, or `resolved`
+- `severity` (optional) - Filter by severity: `info`, `warning`, `error`, or `critical`
+- `device` (optional) - Filter by device UID
+- `rule` (optional) - Filter by rule UID
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### fleet_list_rules
+
+List fleet monitoring rules.
+
+**Parameters**:
+- `enabled` (optional) - Filter by enabled status
+- `limit` (optional) - Maximum number of results
+- `cursor` (optional) - Pagination cursor
+
+### fleet_register_device **Write**
+
+Register a new fleet device.
+
+**Parameters**:
+- `name` (required) - Device name
+- `type` (required) - Device type
+- `firmwareVersion` (optional) - Firmware version
+- `tags` (optional) - Array of tags
+
+### fleet_acknowledge_alert **Write**
+
+Acknowledge a fleet alert.
+
+**Parameters**:
+- `uid` (required) - Alert UUID to acknowledge
+
+## Response format
+
+All tools return JSON responses. Successful operations include the requested data or confirmation:
+
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"uid\":\"abc123\",\"name\":\"My Dataset\",...}"
+    }
+  ]
+}
+```
+
+Paginated responses include cursor information for fetching additional pages:
+
+```json
+{
+  "items": [...],
+  "cursor": "eyJpZCI6MTIzfQ==",
+  "hasMore": true
+}
+```

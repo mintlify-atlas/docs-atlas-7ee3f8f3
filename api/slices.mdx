@@ -1,0 +1,260 @@
+---
+title: Slices
+description: Manage dataset slices and slice items
+---
+
+Slices allow you to create curated subsets of your datasets with specific selection criteria.
+
+## Slices
+
+### List slices
+
+Retrieve a paginated list of slices for a specific owner.
+
+```typescript
+await avala.slices.list(owner, options?)
+```
+
+<ParamField path="owner" type="string" required>
+  The owner (username or organization slug) of the slices.
+</ParamField>
+
+<ParamField path="options" type="object">
+  Optional parameters for pagination.
+  
+  <ParamField path="limit" type="number">
+    Maximum number of slices to return per page.
+  </ParamField>
+  
+  <ParamField path="cursor" type="string">
+    Cursor for pagination to fetch the next page of results.
+  </ParamField>
+</ParamField>
+
+<ResponseField name="items" type="Slice[]">
+  Array of slice objects.
+  
+  <ResponseField name="uid" type="string">
+    Unique identifier for the slice.
+  </ResponseField>
+  
+  <ResponseField name="name" type="string">
+    Name of the slice.
+  </ResponseField>
+  
+  <ResponseField name="slug" type="string | null">
+    URL-friendly slug for the slice.
+  </ResponseField>
+  
+  <ResponseField name="ownerName" type="string | null">
+    Name of the slice owner.
+  </ResponseField>
+  
+  <ResponseField name="organization" type="object | null">
+    Organization details if the slice belongs to an organization.
+  </ResponseField>
+  
+  <ResponseField name="visibility" type="string | null">
+    Visibility setting for the slice (e.g., public, private).
+  </ResponseField>
+  
+  <ResponseField name="status" type="string | null">
+    Current status of the slice.
+  </ResponseField>
+  
+  <ResponseField name="itemCount" type="number | null">
+    Number of items in the slice.
+  </ResponseField>
+  
+  <ResponseField name="subSlices" type="object[] | null">
+    Array of sub-slice configurations.
+  </ResponseField>
+  
+  <ResponseField name="featuredSliceItemUrls" type="string[] | null">
+    URLs of featured items from the slice.
+  </ResponseField>
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results.
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results.
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether there are more results available.
+</ResponseField>
+
+### Get slice
+
+Retrieve a specific slice by owner and slug.
+
+```typescript
+await avala.slices.get(owner, slug)
+```
+
+<ParamField path="owner" type="string" required>
+  The owner (username or organization slug) of the slice.
+</ParamField>
+
+<ParamField path="slug" type="string" required>
+  The slug of the slice to retrieve.
+</ParamField>
+
+### Create slice
+
+Create a new slice with specific selection criteria.
+
+```typescript
+await avala.slices.create(options)
+```
+
+<ParamField path="options" type="object" required>
+  <ParamField path="name" type="string" required>
+    Name of the slice.
+  </ParamField>
+  
+  <ParamField path="visibility" type="string" required>
+    Visibility setting for the slice (e.g., "public", "private").
+  </ParamField>
+  
+  <ParamField path="subSlices" type="Array<object>" required>
+    Array of sub-slice configurations that define the selection criteria.
+  </ParamField>
+  
+  <ParamField path="organization" type="string">
+    Organization slug if creating the slice under an organization.
+  </ParamField>
+  
+  <ParamField path="randomSelectionCount" type="number">
+    Number of items to randomly select for the slice.
+  </ParamField>
+</ParamField>
+
+## Slice items
+
+### List slice items
+
+Retrieve a paginated list of items in a slice.
+
+```typescript
+await avala.slices.listItems(owner, slug, options?)
+```
+
+<ParamField path="owner" type="string" required>
+  The owner (username or organization slug) of the slice.
+</ParamField>
+
+<ParamField path="slug" type="string" required>
+  The slug of the slice.
+</ParamField>
+
+<ParamField path="options" type="object">
+  Optional parameters for pagination.
+  
+  <ParamField path="limit" type="number">
+    Maximum number of items to return per page.
+  </ParamField>
+  
+  <ParamField path="cursor" type="string">
+    Cursor for pagination to fetch the next page of results.
+  </ParamField>
+</ParamField>
+
+<ResponseField name="items" type="SliceItem[]">
+  Array of slice item objects.
+  
+  <ResponseField name="uid" type="string">
+    Unique identifier for the item.
+  </ResponseField>
+  
+  <ResponseField name="id" type="number | null">
+    Numeric ID of the item.
+  </ResponseField>
+  
+  <ResponseField name="key" type="string | null">
+    Key identifier for the item.
+  </ResponseField>
+  
+  <ResponseField name="dataset" type="string | null">
+    Dataset UID that the item belongs to.
+  </ResponseField>
+  
+  <ResponseField name="url" type="string | null">
+    URL to access the item.
+  </ResponseField>
+  
+  <ResponseField name="gpuTextureUrl" type="string | null">
+    GPU texture URL for optimized rendering.
+  </ResponseField>
+  
+  <ResponseField name="thumbnails" type="string[] | null">
+    Array of thumbnail URLs.
+  </ResponseField>
+  
+  <ResponseField name="videoThumbnail" type="string | null">
+    Video thumbnail URL if the item is a video.
+  </ResponseField>
+  
+  <ResponseField name="metadata" type="object | null">
+    Additional metadata associated with the item.
+  </ResponseField>
+  
+  <ResponseField name="annotations" type="object | null">
+    Annotation data for the item.
+  </ResponseField>
+  
+  <ResponseField name="cropData" type="object | null">
+    Crop data for the item.
+  </ResponseField>
+  
+  <ResponseField name="relatedItems" type="object[] | null">
+    Array of related items.
+  </ResponseField>
+  
+  <ResponseField name="relatedSequenceUid" type="string | null">
+    UID of related sequence if applicable.
+  </ResponseField>
+  
+  <ResponseField name="createdAt" type="string | null">
+    Timestamp when the item was created.
+  </ResponseField>
+  
+  <ResponseField name="updatedAt" type="string | null">
+    Timestamp when the item was last updated.
+  </ResponseField>
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results.
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results.
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether there are more results available.
+</ResponseField>
+
+### Get slice item
+
+Retrieve a specific item from a slice.
+
+```typescript
+await avala.slices.getItem(owner, slug, itemUid)
+```
+
+<ParamField path="owner" type="string" required>
+  The owner (username or organization slug) of the slice.
+</ParamField>
+
+<ParamField path="slug" type="string" required>
+  The slug of the slice.
+</ParamField>
+
+<ParamField path="itemUid" type="string" required>
+  The unique identifier of the item to retrieve.
+</ParamField>

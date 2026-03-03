@@ -1,0 +1,104 @@
+---
+title: Exports
+description: Create and manage data exports in the Avala platform
+---
+
+The `ExportsResource` provides methods to create, list, and retrieve data exports from projects or datasets.
+
+## List exports
+
+Retrieve a paginated list of all exports.
+
+```typescript
+const response = await avala.exports.list({
+  limit: 50
+});
+```
+
+### Parameters
+
+<ParamField path="limit" type="number">
+  Maximum number of results to return
+</ParamField>
+
+<ParamField path="cursor" type="string">
+  Cursor for pagination
+</ParamField>
+
+### Returns
+
+<ResponseField name="items" type="Export[]">
+  Array of export objects
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Cursor for the next page of results
+</ResponseField>
+
+<ResponseField name="previousCursor" type="string | null">
+  Cursor for the previous page of results
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  Whether there are more results available
+</ResponseField>
+
+## Create an export
+
+Create a new export for a project or dataset.
+
+```typescript
+const exportJob = await avala.exports.create({
+  project: "project_uid"
+});
+```
+
+### Parameters
+
+<ParamField path="project" type="string">
+  The UID of the project to export
+</ParamField>
+
+<ParamField path="dataset" type="string">
+  The UID of the dataset to export
+</ParamField>
+
+### Returns
+
+<ResponseField name="uid" type="string">
+  The unique identifier for the export
+</ResponseField>
+
+<ResponseField name="status" type="string | null">
+  The current status of the export (e.g., "pending", "processing", "completed")
+</ResponseField>
+
+<ResponseField name="downloadUrl" type="string | null">
+  The URL to download the export file once completed
+</ResponseField>
+
+<ResponseField name="createdAt" type="string | null">
+  The timestamp when the export was created
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string | null">
+  The timestamp when the export was last updated
+</ResponseField>
+
+## Get an export
+
+Retrieve a specific export by its unique identifier.
+
+```typescript
+const exportJob = await avala.exports.get("export_uid");
+```
+
+### Parameters
+
+<ParamField path="uid" type="string" required>
+  The unique identifier of the export
+</ParamField>
+
+### Returns
+
+Returns an `Export` object with the same fields as the create response.
